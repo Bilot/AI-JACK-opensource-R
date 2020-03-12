@@ -1,6 +1,6 @@
 # AI-jack open source for R
 
-<img src="https://github.com/bilotAIcore/rabbitAI/blob/master/AI-JACK-logo.png"/>
+<img src="https://github.com/Bilot/AI-jack-opensource-R/blob/master/AI-JACK-logo.png"/>
 
 <br>
 

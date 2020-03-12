@@ -55,7 +55,7 @@ To install the <b>AI-jack</b> package, all you need is to run the following comm
 </p>
 
 ```r
-devtools::install_github(repo = "")
+devtools::install_github(repo = "Bilot/AI-jack-opensource-R")
 ```
 
 Next, one is able to initiate a project as follows:

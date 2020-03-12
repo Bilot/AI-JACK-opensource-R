@@ -1,0 +1,15 @@
+COLUMN_NAME; TYPE_NAME
+CRIM; real
+ZN; real
+INDUS; real
+CHAS; real
+NOX; real
+RM; real
+AGE; real
+DIS; real
+RAD; real
+TAX; real
+PTRATIO; real
+B; real
+LSTAT; real
+MEDV; real

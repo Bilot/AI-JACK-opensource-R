@@ -710,6 +710,7 @@ print("Bilot AI-core",quote = F)
 print("=========================",quote = F)
 print("Starting new session...",quote = F)
 rm(list=ls())
+library(AIjack)
 
 # (2) Get datetime for logs and model names ----
 get_datetime <- format(Sys.time(),"%Y_%m_%d_%H_%M")
@@ -799,6 +800,7 @@ rm(list=ls())
 print("Bilot AI-core",quote = F)
 print("=========================",quote = F)
 print("Starting new session...",quote = F)
+library(AIjack)
 
 # (2) Get datetime for logs and model names ----
 get_datetime <- format(Sys.time(),"%Y_%m_%d_%H_%M")
@@ -874,6 +876,7 @@ clean_up()
 
 # (1) Clear session and set working directory ----
 rm(list=ls())
+library(AIjack)
 
 # (2) Source main settings and functions ----
 source("config_plumber.r")

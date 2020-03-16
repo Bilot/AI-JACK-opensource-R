@@ -25,175 +25,175 @@
 
 init_aijack <- function(path) {
 
-    if (!dir.exists(path)) {
-        dir.create(path)
-    }
+  if (!dir.exists(path)) {
+    dir.create(path)
+  }
 
-    sep = ifelse(grepl("/$", path), "", "/")
-    directories = list(
-        source_model = paste(path, "source_model",sep = sep),
-        source_apply = paste(path, "source_apply",sep = sep),
-        output_model = paste(path, "output_model",sep = sep),
-        output_apply = paste(path, "output_apply",sep = sep),
-        output_plumber = paste(path, "output_plumber",sep = sep),
-        logs = paste(path, "logs", sep = sep),
-        control = paste(path, "control", sep = sep)
-        )
+  sep = ifelse(grepl("/$", path), "", "/")
+  directories = list(
+    source_model = paste(path, "source_model",sep = sep),
+    source_apply = paste(path, "source_apply",sep = sep),
+    output_model = paste(path, "output_model",sep = sep),
+    output_apply = paste(path, "output_apply",sep = sep),
+    output_plumber = paste(path, "output_plumber",sep = sep),
+    logs = paste(path, "logs", sep = sep),
+    control = paste(path, "control", sep = sep)
+  )
 
-    output_folders = c("discretization", "factor_levels",
-        "data_objects", "models", "parameters", "results")
-    output_model_dirs = paste(directories$output_model,
-        output_folders, sep = "/")
+  output_folders = c("discretization", "factor_levels",
+                     "data_objects", "models", "parameters", "results")
+  output_model_dirs = paste(directories$output_model,
+                            output_folders, sep = "/")
 
-    # Create 1st directory level: ----
-    for (d in names(directories)) {
-        if (!dir.exists(directories[[d]])) {
-            dir.create(directories[[d]], recursive = T)
-        }
+  # Create 1st directory level: ----
+  for (d in names(directories)) {
+    if (!dir.exists(directories[[d]])) {
+      dir.create(directories[[d]], recursive = T)
     }
+  }
 
-    # Create 2nd directory level: ----
-    for (d in output_model_dirs) {
-        if (!dir.exists(d)) {
-            dir.create(d)
-        }
+  # Create 2nd directory level: ----
+  for (d in output_model_dirs) {
+    if (!dir.exists(d)) {
+      dir.create(d)
     }
+  }
 
-    # Fill directories: ----
-    add = list("cut-points and factor levels for discretised features",
-        "factor levels in the training data", "data objects (main-list)",
-        "trained models", "parameter objects", "tables of modelling results",
-        "error and warning logs")
-    names(add) = output_folders
-    ending = "for each execution ID\n"
+  # Fill directories: ----
+  add = list("cut-points and factor levels for discretised features",
+             "factor levels in the training data", "data objects (main-list)",
+             "trained models", "parameter objects", "tables of modelling results",
+             "error and warning logs")
+  names(add) = output_folders
+  ending = "for each execution ID\n"
 
-    readmes = lapply(as.list(output_folders), function(x) {
-        paste0("This directory will be populated with ",
-            add[[x]], ", ", ending)
-    })
-    names(readmes) = output_folders
-    for (d in output_folders) {
-        where = paste(directories$output_model, d, "README.txt",
-            sep = "/")
-        cat(readmes[[d]], file = where)
-    }
+  readmes = lapply(as.list(output_folders), function(x) {
+    paste0("This directory will be populated with ",
+           add[[x]], ", ", ending)
+  })
+  names(readmes) = output_folders
+  for (d in output_folders) {
+    where = paste(directories$output_model, d, "README.txt",
+                  sep = "/")
+    cat(readmes[[d]], file = where)
+  }
 
-    # Fill output_model/results: ----
-    tables = c("accuracy", "column_importance", "models",
-        "validation", "execution", "coefficients", "metadata",
-        "columns", "warning_error")
-    table_list = paste0(path, "/output_model/results/",
-        tables, ".csv")
-    table_list = as.list(table_list)
-    names(table_list) = tables
+  # Fill output_model/results: ----
+  tables = c("accuracy", "column_importance", "models",
+             "validation", "execution", "coefficients", "metadata",
+             "columns", "warning_error")
+  table_list = paste0(path, "/output_model/results/",
+                      tables, ".csv")
+  table_list = as.list(table_list)
+  names(table_list) = tables
 
-    if (!file.exists(table_list$accuracy)) {
-        tab = data.frame(executionid = numeric(0), time = character(0),
-            label = character(0), model_name = character(0),
-            metric = character(0), value_train = numeric(0),
-            value_test = numeric(0), value_val = numeric(0))
-        write.csv2(tab, table_list$accuracy, row.names = F)
-    }
-    if (!file.exists(table_list$column_importance)) {
-        tab = data.frame(executionid = numeric(0), label = character(0),
-            model_name = character(0), variable = character(0),
-            relative_importance = numeric(0), scaled_importance = numeric(0),
-            percentage = numeric(0))
-        write.csv2(tab, table_list$column_importance, row.names = F)
-    }
-    if (!file.exists(table_list$models)) {
-        tab = data.frame(executionid = numeric(0), label = character(0),
-            model_name = character(0), apply = numeric(0))
-        write.csv2(tab, table_list$models, row.names = F)
-    }
-    if (!file.exists(table_list$validation)) {
-        tab = data.frame(executionid = numeric(0), model_name = character(0),
-            row_identifier = character(0), obs = numeric(0),
-            pred = numeric(0), prob = numeric(0))
-        write.csv2(tab, table_list$validation, row.names = F)
-    }
-    if (!file.exists(table_list$execution)) {
-        tab = data.frame(executionid = numeric(0), preddate = character(0),
-            predtime = character(0), query = character(0))
-        write.csv2(tab, table_list$execution, row.names = F)
-    }
-    if (!file.exists(table_list$coefficients)) {
-        tab = data.frame(executionid = numeric(0), label = character(0),
-            variable = character(0), coef = character(0),
-            model_name = character(0))
-        write.csv2(tab, table_list$coefficients, row.names = F)
-    }
-    if (!file.exists(table_list$metadata)) {
-        tab = data.frame(executionid = numeric(0), column = character(0),
-            stat1 = character(0), stat2 = character(0),
-            stat3 = character(0), stat4 = character(0),
-            stat5 = character(0), stat6 = character(0),
-            stat7 = character(0))
-        write.csv2(tab, table_list$metadata, row.names = F)
-    }
-    if (!file.exists(table_list$columns)) {
-        tab = data.frame(executionid = numeric(0), column = character(0),
-            label = character(0), used_in_model = character(0))
-        write.csv2(tab, table_list$columns, row.names = F)
-    }
-    if (!file.exists(table_list$warning_error)) {
-        tab = data.frame(executionid = numeric(0), model_name = character(0),
-            label = character(0), phase = character(0),
-            description = character(0))
-        write.csv2(tab, table_list$warning_error, row.names = F)
-    }
+  if (!file.exists(table_list$accuracy)) {
+    tab = data.frame(executionid = numeric(0), time = character(0),
+                     label = character(0), model_name = character(0),
+                     metric = character(0), value_train = numeric(0),
+                     value_test = numeric(0), value_val = numeric(0))
+    write.csv2(tab, table_list$accuracy, row.names = F)
+  }
+  if (!file.exists(table_list$column_importance)) {
+    tab = data.frame(executionid = numeric(0), label = character(0),
+                     model_name = character(0), variable = character(0),
+                     relative_importance = numeric(0), scaled_importance = numeric(0),
+                     percentage = numeric(0))
+    write.csv2(tab, table_list$column_importance, row.names = F)
+  }
+  if (!file.exists(table_list$models)) {
+    tab = data.frame(executionid = numeric(0), label = character(0),
+                     model_name = character(0), apply = numeric(0))
+    write.csv2(tab, table_list$models, row.names = F)
+  }
+  if (!file.exists(table_list$validation)) {
+    tab = data.frame(executionid = numeric(0), model_name = character(0),
+                     row_identifier = character(0), obs = numeric(0),
+                     pred = numeric(0), prob = numeric(0))
+    write.csv2(tab, table_list$validation, row.names = F)
+  }
+  if (!file.exists(table_list$execution)) {
+    tab = data.frame(executionid = numeric(0), preddate = character(0),
+                     predtime = character(0), query = character(0))
+    write.csv2(tab, table_list$execution, row.names = F)
+  }
+  if (!file.exists(table_list$coefficients)) {
+    tab = data.frame(executionid = numeric(0), label = character(0),
+                     variable = character(0), coef = character(0),
+                     model_name = character(0))
+    write.csv2(tab, table_list$coefficients, row.names = F)
+  }
+  if (!file.exists(table_list$metadata)) {
+    tab = data.frame(executionid = numeric(0), column = character(0),
+                     stat1 = character(0), stat2 = character(0),
+                     stat3 = character(0), stat4 = character(0),
+                     stat5 = character(0), stat6 = character(0),
+                     stat7 = character(0))
+    write.csv2(tab, table_list$metadata, row.names = F)
+  }
+  if (!file.exists(table_list$columns)) {
+    tab = data.frame(executionid = numeric(0), column = character(0),
+                     label = character(0), used_in_model = character(0))
+    write.csv2(tab, table_list$columns, row.names = F)
+  }
+  if (!file.exists(table_list$warning_error)) {
+    tab = data.frame(executionid = numeric(0), model_name = character(0),
+                     label = character(0), phase = character(0),
+                     description = character(0))
+    write.csv2(tab, table_list$warning_error, row.names = F)
+  }
 
-    # Fill output_apply/results: ----
-    cat("This directory will be populated with tables of model application execution",
-        file = paste0(path, "/output_apply/README.txt"))
-    tables = c("execution", "execution_model", "predictions")
-    table_list = paste0(path, "/output_apply/", tables,
-        ".csv")
-    table_list = as.list(table_list)
-    names(table_list) = tables
+  # Fill output_apply/results: ----
+  cat("This directory will be populated with tables of model application execution",
+      file = paste0(path, "/output_apply/README.txt"))
+  tables = c("execution", "execution_model", "predictions")
+  table_list = paste0(path, "/output_apply/", tables,
+                      ".csv")
+  table_list = as.list(table_list)
+  names(table_list) = tables
 
-    if (!file.exists(table_list$execution)) {
-        tab = data.frame(executionid = numeric(0), preddate = character(0),
-            predtime = character(0), query = character(0))
-        write.csv2(tab, table_list$execution, row.names = F)
-    }
-    if (!file.exists(table_list$execution_model)) {
-        tab = data.frame(executionid = numeric(0), label = character(0),
-            model_name = character(0), rowid = character(0))
-        write.csv2(tab, table_list$execution_model, row.names = F)
-    }
-    if (!file.exists(table_list$predictions)) {
-        tab = data.frame(rowid = numeric(0), id = character(0),
-            type = character(0), pred = character(0), model = character(0))
-        write.csv2(tab, table_list$predictions, row.names = F)
-    }
+  if (!file.exists(table_list$execution)) {
+    tab = data.frame(executionid = numeric(0), preddate = character(0),
+                     predtime = character(0), query = character(0))
+    write.csv2(tab, table_list$execution, row.names = F)
+  }
+  if (!file.exists(table_list$execution_model)) {
+    tab = data.frame(executionid = numeric(0), label = character(0),
+                     model_name = character(0), rowid = character(0))
+    write.csv2(tab, table_list$execution_model, row.names = F)
+  }
+  if (!file.exists(table_list$predictions)) {
+    tab = data.frame(rowid = numeric(0), id = character(0),
+                     type = character(0), pred = character(0), model = character(0))
+    write.csv2(tab, table_list$predictions, row.names = F)
+  }
 
-    # Fill output_plumber: ----
-    cat("This directory will be populated with a table of API predictions",
-        file = paste0(path, "/output_plumber/README.txt"))
-    tables = "predictions"
-    table_list = paste0(path, "/output_plumber/", tables,
-        ".csv")
-    table_list = as.list(table_list)
-    names(table_list) = tables
-    if (!file.exists(table_list$predictions)) {
-        tab = data.frame(ID = character(0),
-            predict = numeric(0),
-            model_name = character(0),
-            predtime = character(0),
-            notions = character(0),
-            parameters = character(0))
-        write.csv2(tab, table_list$predictions, row.names = F)
-    }
+  # Fill output_plumber: ----
+  cat("This directory will be populated with a table of API predictions",
+      file = paste0(path, "/output_plumber/README.txt"))
+  tables = "predictions"
+  table_list = paste0(path, "/output_plumber/", tables,
+                      ".csv")
+  table_list = as.list(table_list)
+  names(table_list) = tables
+  if (!file.exists(table_list$predictions)) {
+    tab = data.frame(ID = character(0),
+                     predict = numeric(0),
+                     model_name = character(0),
+                     predtime = character(0),
+                     notions = character(0),
+                     parameters = character(0))
+    write.csv2(tab, table_list$predictions, row.names = F)
+  }
 
-    print("Directory structure created.",quote = F)
+  print("Directory structure created.",quote = F)
 
-    # Create config_model.R: ----
-    sink(
-      file=paste0(directories$control,"/config_model.R")
-    )
-    cat(
-      '
+  # Create config_model.R: ----
+  sink(
+    file=paste0(directories$control,"/config_model.R")
+  )
+  cat(
+    '
 # CONFIG_MODEL
 #
 # This config-file is used to
@@ -511,14 +511,14 @@ set$csv$result <- list(
 print("Settings created.", quote = F)
 
 ')
-  sink()
+sink()
 
-  # Create config_apply.R: ----
-  sink(
-    file=paste0(directories$control,"/config_apply.R")
-  )
-  cat(
-    '
+# Create config_apply.R: ----
+sink(
+  file=paste0(directories$control,"/config_apply.R")
+)
+cat(
+  '
 # CONFIG_APPLY
 #
 # This confiq-file is used to
@@ -613,14 +613,14 @@ set$csv$result = list(
 
 print("Settings created", quote = F)
     ')
-  sink()
+sink()
 
-  # Create config_plumber.R: ----
-  sink(
-    file=paste0(directories$control,"/config_plumber.R")
-  )
-  cat(
-    '
+# Create config_plumber.R: ----
+sink(
+  file=paste0(directories$control,"/config_plumber.R")
+)
+cat(
+  '
 # CONFIG_PLUMBER
 #
 # This confiq-file is used to
@@ -683,15 +683,15 @@ set$odbc <- list(
 set$odbc$query_r <- paste("SELECT * FROM",
                           set$odbc$model_table, " WHERE apply=1", sep=" ")
     '
-  )
-  sink()
+)
+sink()
 
-  # Create main_model.R: ----
-  sink(
-    file=paste0(directories$control,"/main_model.R")
-  )
-  cat(
-    '
+# Create main_model.R: ----
+sink(
+  file=paste0(directories$control,"/main_model.R")
+)
+cat(
+  '
 # BILOT AI-jack, main-file for MODELLING
 #
 # Can be executed either line-by-line, or called
@@ -706,9 +706,8 @@ set$odbc$query_r <- paste("SELECT * FROM",
 # bearing in mind that it comes with no warranty.
 
 # (1) Clear session ----
-print("Bilot AI-core",quote = F)
-print("=========================",quote = F)
-print("Starting new session...",quote = F)
+library(AIjack)
+print_message("AI-jack: starting new session...")
 rm(list=ls())
 
 # (2) Get datetime for logs and model names ----
@@ -771,15 +770,15 @@ save_data(main,set,prep,get_datetime)
 # (16) Stop logging, print warnings & close connections ----
 clean_up()
     '
-  )
-  sink()
+)
+sink()
 
-  # Create main_apply.R: ----
-  sink(
-    file=paste0(directories$control,"/main_apply.R")
-  )
-  cat(
-    '
+# Create main_apply.R: ----
+sink(
+  file=paste0(directories$control,"/main_apply.R")
+)
+cat(
+  '
 # BILOT AI-jack, main-file for APPLYING models
 #
 # Can be executed either line-by-line, or called
@@ -793,12 +792,10 @@ clean_up()
 # Any user is free to modify this software for their own needs,
 # bearing in mind that it comes with no warranty.
 
-rm(list=ls())
-
 # (1) Clear session ----
-print("Bilot AI-core",quote = F)
-print("=========================",quote = F)
-print("Starting new session...",quote = F)
+library(AIjack)
+print_message("AI-jack: starting new session...")
+rm(list=ls())
 
 # (2) Get datetime for logs and model names ----
 get_datetime <- format(Sys.time(),"%Y_%m_%d_%H_%M")
@@ -850,15 +847,15 @@ write_exec(set = set,prep = prep,odbc = odbc)
 clean_up()
 
     '
-  )
-  sink()
+)
+sink()
 
-  # Create main_plumber.R: ----
-  sink(
-    file=paste0(directories$control,"/main_plumber.R")
-  )
-  cat(
-    '
+# Create main_plumber.R: ----
+sink(
+  file=paste0(directories$control,"/main_plumber.R")
+)
+cat(
+  '
 # BILOT AI-jack, main-file for WEB SERVICE
 #
 # Can be executed either line-by-line, or called
@@ -872,7 +869,7 @@ clean_up()
 # Any user is free to modify this software for their own needs,
 # bearing in mind that it comes with no warranty.
 
-# (1) Clear session and set working directory ----
+# (1) Clear session ----
 rm(list=ls())
 
 # (2) Source main settings and functions ----
@@ -909,15 +906,15 @@ r <- plumber::plumb("control/plumber_core.R")
 # Expose API:
 r$run(host="0.0.0.0",port=12345,swagger=TRUE)
     '
-  )
-  sink()
+)
+sink()
 
-  # Create plumber_core.R: ----
-  sink(
-    file=paste0(directories$control,"/plumber_core.R")
-  )
-  cat(
-    '
+# Create plumber_core.R: ----
+sink(
+  file=paste0(directories$control,"/plumber_core.R")
+)
+cat(
+  '
 #* @param param parameter string values
 #* @param param parameter string colnames
 #* @post /predict
@@ -928,11 +925,11 @@ function(param, param2, param3){
     plumber_predict(df, set, param, param2, param3, "")
 }
     '
-  )
-  sink()
+)
+sink()
 
-  print("Control files created.", quote = F)
-  print("AI-jack project initiation complete.", quote = F)
+print("Control files created.", quote = F)
+print("AI-jack project initiation complete.", quote = F)
 }
 
 
@@ -948,20 +945,20 @@ function(param, param2, param3){
 
 prep_results <- function(set, main, odbc) {
 
-    start <- Sys.time()
-    types <- main$with_types$value$Variable_types
-    data <- main$with_types$value$Data_with_types
+  start <- Sys.time()
+  types <- main$with_types$value$Variable_types
+  data <- main$with_types$value$Data_with_types
 
-    if (set$main$use_db) {
-        prep <- db_preparations(set, types, data, odbc$value$odbc_metadata)
-    } else {
-        prep <- csv_preparations(set, main)
-    }
+  if (set$main$use_db) {
+    prep <- db_preparations(set, types, data, odbc$value$odbc_metadata)
+  } else {
+    prep <- csv_preparations(set, main)
+  }
 
-    print("Result tables pre-created.", quote = F)
-    print_time(start)
+  print("Result tables pre-created.", quote = F)
+  print_time(start)
 
-    return(prep)
+  return(prep)
 }
 
 #' Handling excution logs
@@ -976,17 +973,17 @@ prep_results <- function(set, main, odbc) {
 
 logging_control <- function(set) {
 
-    if (set$main$write_to_log) {
-        log_file <- file(paste(set$main$project_path, "/",
-            set$main$log_path, "/log_modelling_", get_datetime,
-            ".txt", sep = ""), open = "wt")
-        sink(log_file, type = "message")
-        target <- ifelse(set$main$use_db, "DB", "file")
-        print(paste0("Logs will be written to ", target),
-            quote = F)
-    } else {
-        print("Logs will be printed to console", quote = F)
-    }
+  if (set$main$write_to_log) {
+    log_file <- file(paste(set$main$project_path, "/",
+                           set$main$log_path, "/log_modelling_", get_datetime,
+                           ".txt", sep = ""), open = "wt")
+    sink(log_file, type = "message")
+    target <- ifelse(set$main$use_db, "DB", "file")
+    print(paste0("Logs will be written to ", target),
+          quote = F)
+  } else {
+    print("Logs will be printed to console", quote = F)
+  }
 }
 
 #' Function for printing messages
@@ -996,11 +993,11 @@ logging_control <- function(set) {
 #' @export
 
 print_message <- function(text) {
-    print("", quote = FALSE)
-    print(paste0(rep("-", nchar(text)), collapse = ""),
+  print("", quote = FALSE)
+  print(paste0(rep("-", nchar(text)), collapse = ""),
         quote = FALSE)
-    print(text, quote = FALSE)
-    print(paste0(rep("-", nchar(text)), collapse = ""),
+  print(text, quote = FALSE)
+  print(paste0(rep("-", nchar(text)), collapse = ""),
         quote = FALSE)
 }
 
@@ -1011,9 +1008,9 @@ print_message <- function(text) {
 #' @export
 
 print_time <- function(start) {
-    x = round((Sys.time() - start), 1)
-    print(paste("   Took:", as.numeric(x), attr(x, "units")),
-          quote = F)
+  x = round((Sys.time() - start), 1)
+  print(paste("   Took:", as.numeric(x), attr(x, "units")),
+        quote = F)
 }
 
 #' Catching up warnings-messages
@@ -1026,13 +1023,13 @@ print_time <- function(start) {
 
 
 withWarnings <- function(expr) {
-    myWarnings <- NULL
-    wHandler <- function(w) {
-        myWarnings <<- c(myWarnings, list(w))
-        invokeRestart("muffleWarning")
-    }
-    val <- withCallingHandlers(expr, warning = wHandler)
-    return(list(value = val, warnings = myWarnings))
+  myWarnings <- NULL
+  wHandler <- function(w) {
+    myWarnings <<- c(myWarnings, list(w))
+    invokeRestart("muffleWarning")
+  }
+  val <- withCallingHandlers(expr, warning = wHandler)
+  return(list(value = val, warnings = myWarnings))
 }
 
 
@@ -1050,19 +1047,19 @@ withWarnings <- function(expr) {
 #' @export
 
 handling_trycatch <- function(expr) {
-    from <- deparse(sys.calls()[[sys.nframe()]])
-    start <- Sys.time()
-    warnings <- NULL
-    f.warning <- function(war) {
-        warnings <<- list(paste(war, collapse = " | "))
-        invokeRestart("muffleWarning")
-    }
-    temp <- list(value = withCallingHandlers(tryCatch(expr,
-                                                      error = function(err) list(from = from, error = paste(paste(err),
-                                                                                                            collapse = " | "))), warning = f.warning),
-                 warning = warnings)
-    return(list(value = temp$value, warning = temp$warning[[1]],
-                execution_time = round((Sys.time() - start), 1)))
+  from <- deparse(sys.calls()[[sys.nframe()]])
+  start <- Sys.time()
+  warnings <- NULL
+  f.warning <- function(war) {
+    warnings <<- list(paste(war, collapse = " | "))
+    invokeRestart("muffleWarning")
+  }
+  temp <- list(value = withCallingHandlers(tryCatch(expr,
+                                                    error = function(err) list(from = from, error = paste(paste(err),
+                                                                                                          collapse = " | "))), warning = f.warning),
+               warning = warnings)
+  return(list(value = temp$value, warning = temp$warning[[1]],
+              execution_time = round((Sys.time() - start), 1)))
 }
 
 
@@ -1073,96 +1070,96 @@ handling_trycatch <- function(expr) {
 #'
 #' @export
 rbind_diff <- function(..., deparse.level = 1) {
-    na <- nargs() - (!missing(deparse.level))
-    deparse.level <- as.integer(deparse.level)
-    stopifnot(0 <= deparse.level, deparse.level <= 2)
-    argl <- list(...)
-    while (na > 0 && is.null(argl[[na]])) {
-        argl <- argl[-na]
-        na <- na - 1
+  na <- nargs() - (!missing(deparse.level))
+  deparse.level <- as.integer(deparse.level)
+  stopifnot(0 <= deparse.level, deparse.level <= 2)
+  argl <- list(...)
+  while (na > 0 && is.null(argl[[na]])) {
+    argl <- argl[-na]
+    na <- na - 1
+  }
+  if (na == 0)
+    return(NULL)
+  if (na == 1) {
+    if (isS4(..1))
+      return(rbind2(..1)) else return(matrix(..., nrow = 1))
+  }
+  if (deparse.level) {
+    symarg <- as.list(sys.call()[-1L])[1L:na]
+    Nms <- function(i) {
+      if (is.null(r <- names(symarg[i])) || r ==
+          "") {
+        if (is.symbol(r <- symarg[[i]]) || deparse.level ==
+            2)
+          deparse(r)
+      } else r
     }
-    if (na == 0)
-        return(NULL)
-    if (na == 1) {
-        if (isS4(..1))
-            return(rbind2(..1)) else return(matrix(..., nrow = 1))
-    }
+  }
+  if (na == 0) {
+    r <- argl[[2]]
+    fix.na <- FALSE
+  } else {
+    nrs <- unname(lapply(argl, ncol))
+    iV <- sapply(nrs, is.null)
+    fix.na <- identical(nrs[(na - 1):na], list(NULL,
+                                               NULL))
     if (deparse.level) {
-        symarg <- as.list(sys.call()[-1L])[1L:na]
-        Nms <- function(i) {
-            if (is.null(r <- names(symarg[i])) || r ==
-                "") {
-                if (is.symbol(r <- symarg[[i]]) || deparse.level ==
-                  2)
-                  deparse(r)
-            } else r
-        }
+      if (fix.na)
+        fix.na <- !is.null(Nna <- Nms(na))
+      if (!is.null(nmi <- names(argl)))
+        iV <- iV & (nmi == "")
+      ii <- if (fix.na)
+        2:(na - 1) else 2:na
+      if (any(iV[ii])) {
+        for (i in ii[iV[ii]]) if (!is.null(nmi <- Nms(i)))
+          names(argl)[i] <- nmi
+      }
     }
-    if (na == 0) {
-        r <- argl[[2]]
-        fix.na <- FALSE
-    } else {
-        nrs <- unname(lapply(argl, ncol))
-        iV <- sapply(nrs, is.null)
-        fix.na <- identical(nrs[(na - 1):na], list(NULL,
-            NULL))
-        if (deparse.level) {
-            if (fix.na)
-                fix.na <- !is.null(Nna <- Nms(na))
-            if (!is.null(nmi <- names(argl)))
-                iV <- iV & (nmi == "")
-            ii <- if (fix.na)
-                2:(na - 1) else 2:na
-            if (any(iV[ii])) {
-                for (i in ii[iV[ii]]) if (!is.null(nmi <- Nms(i)))
-                  names(argl)[i] <- nmi
-            }
-        }
-        nCol <- as.numeric(sapply(argl, function(x) if (is.null(ncol(x))) length(x) else ncol(x)))
-        maxCol <- max(nCol, na.rm = TRUE)
-        argl <- lapply(argl, function(x) if (is.null(ncol(x)))
-            c(x, rep(NA, maxCol - length(x))) else cbind(x, matrix(, nrow(x), maxCol - ncol(x))))
-        namesVEC <- rep(NA, maxCol)
-        for (i in 1:length(argl)) {
-            CN <- colnames(argl[[i]])
-            m <- !(CN %in% namesVEC)
-            namesVEC[m] <- CN[m]
-        }
-        for (j in 1:length(argl)) {
-            if (!is.null(ncol(argl[[j]])))
-                colnames(argl[[j]]) <- namesVEC
-        }
-        r <- do.call(rbind, c(argl[-1L], list(deparse.level = deparse.level)))
+    nCol <- as.numeric(sapply(argl, function(x) if (is.null(ncol(x))) length(x) else ncol(x)))
+    maxCol <- max(nCol, na.rm = TRUE)
+    argl <- lapply(argl, function(x) if (is.null(ncol(x)))
+      c(x, rep(NA, maxCol - length(x))) else cbind(x, matrix(, nrow(x), maxCol - ncol(x))))
+    namesVEC <- rep(NA, maxCol)
+    for (i in 1:length(argl)) {
+      CN <- colnames(argl[[i]])
+      m <- !(CN %in% namesVEC)
+      namesVEC[m] <- CN[m]
     }
-    d2 <- dim(r)
-    colnames(r) <- colnames(argl[[1]])
-    r <- rbind2(argl[[1]], r)
-    if (deparse.level == 0)
-        return(r)
-    ism1 <- !is.null(d1 <- dim(..1)) && length(d1) == 2L
-    ism2 <- !is.null(d2) && length(d2) == 2L && !fix.na
-    if (ism1 && ism2)
-        return(r)
-    Nrow <- function(x) {
-        d <- dim(x)
-        if (length(d) == 2L)
-            d[1L] else as.integer(length(x) > 0L)
+    for (j in 1:length(argl)) {
+      if (!is.null(ncol(argl[[j]])))
+        colnames(argl[[j]]) <- namesVEC
     }
-    nn1 <- !is.null(N1 <- if ((l1 <- Nrow(..1)) && !ism1) Nms(1))
-    nn2 <- !is.null(N2 <- if (na == 2 && Nrow(..2) && !ism2) Nms(2))
-    if (nn1 || nn2 || fix.na) {
-        if (is.null(rownames(r)))
-            rownames(r) <- rep.int("", nrow(r))
-        setN <- function(i, nams) rownames(r)[i] <<- if (is.null(nams))
-            "" else nams
-        if (nn1)
-            setN(1, N1)
-        if (nn2)
-            setN(1 + l1, N2)
-        if (fix.na)
-            setN(nrow(r), Nna)
-    }
-    r
+    r <- do.call(rbind, c(argl[-1L], list(deparse.level = deparse.level)))
+  }
+  d2 <- dim(r)
+  colnames(r) <- colnames(argl[[1]])
+  r <- rbind2(argl[[1]], r)
+  if (deparse.level == 0)
+    return(r)
+  ism1 <- !is.null(d1 <- dim(..1)) && length(d1) == 2L
+  ism2 <- !is.null(d2) && length(d2) == 2L && !fix.na
+  if (ism1 && ism2)
+    return(r)
+  Nrow <- function(x) {
+    d <- dim(x)
+    if (length(d) == 2L)
+      d[1L] else as.integer(length(x) > 0L)
+  }
+  nn1 <- !is.null(N1 <- if ((l1 <- Nrow(..1)) && !ism1) Nms(1))
+  nn2 <- !is.null(N2 <- if (na == 2 && Nrow(..2) && !ism2) Nms(2))
+  if (nn1 || nn2 || fix.na) {
+    if (is.null(rownames(r)))
+      rownames(r) <- rep.int("", nrow(r))
+    setN <- function(i, nams) rownames(r)[i] <<- if (is.null(nams))
+      "" else nams
+    if (nn1)
+      setN(1, N1)
+    if (nn2)
+      setN(1 + l1, N2)
+    if (fix.na)
+      setN(nrow(r), Nna)
+  }
+  r
 }
 
 #' Clearing result tables
@@ -1178,17 +1175,17 @@ rbind_diff <- function(..., deparse.level = 1) {
 #'
 #' @export
 clear_model_results = function(result_path = NULL){
-	if(!('result' %in% dir())) stop('result-folder not in path')
+  if(!('result' %in% dir())) stop('result-folder not in path')
 
-	path = paste0(result_path,'/result')
+  path = paste0(result_path,'/result')
 
-	# Loop through tables:
-	for(ii in dir(path)){
-		nam = paste0(path,'/',ii)
-		x = read.csv2(nam,nrow = 1)
-		write.csv2(x[-1,],file = nam,row.names = FALSE)
-	}
-	print('Result tables cleared.')
+  # Loop through tables:
+  for(ii in dir(path)){
+    nam = paste0(path,'/',ii)
+    x = read.csv2(nam,nrow = 1)
+    write.csv2(x[-1,],file = nam,row.names = FALSE)
+  }
+  print('Result tables cleared.')
 }
 
 #' Collecting results back to R from local files
@@ -1199,21 +1196,21 @@ clear_model_results = function(result_path = NULL){
 #'
 #' @export
 collect_results = function(result_path,executionid,
-	tables = c('execution','accuracy','column_importance',
-	'coefficient','metadata','validation')){
+                           tables = c('execution','accuracy','column_importance',
+                                      'coefficient','metadata','validation')){
 
-	files = dir(result_path)
+  files = dir(result_path)
 
-	if(!all(sapply(tables,function(x) any(grepl(x,files))))){
-		stop('All tables not found in result_path.')
-	}
+  if(!all(sapply(tables,function(x) any(grepl(x,files))))){
+    stop('All tables not found in result_path.')
+  }
 
-	nam = sapply(tables,function(x) grep(x,files,value = T))
+  nam = sapply(tables,function(x) grep(x,files,value = T))
   eid = executionid
 
-	results = lapply(nam,function(x){
-    	df <- readr::read_csv2(paste0(result_path,'/',nam[2]))
-    	return(df[df$executionid %in% eid,])
-  	})
-  	return(results)
+  results = lapply(nam,function(x){
+    df <- readr::read_csv2(paste0(result_path,'/',nam[2]))
+    return(df[df$executionid %in% eid,])
+  })
+  return(results)
 }

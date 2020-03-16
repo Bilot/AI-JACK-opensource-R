@@ -155,7 +155,7 @@ The Boston house price data, consisting of ca. 500 rows of indicators of median 
 </p>
 
 <p style='text-align: justify;'>
-Foe each of the datasets, there is also a data types-file available, as well as an unlabelled samples for testing model application.
+For each of the datasets, there is also a data types-file available, as well as an unlabelled samples for testing model application.
 </p>
 
 ## *Web service*

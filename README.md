@@ -219,6 +219,11 @@ The result will be written either to a results table ("output_plumber/prediction
 
 ## *Techinal details*
 
+### Data
+<p style='text-align: justify;'>
+The <code>data_read()</code> function handles the retrieval of raw data from the specified source. When writing output, either <code>write_db()</code> or <code>write_csv()</code> will be used, depending on the data connection. 
+</p>
+
 ### Statistics
 <p style='text-align: justify;'>
 In the workflow, the <code>prep_results()</code> function (among other operations) generates a standard statistical summary of the data, which will be outputted to a <code>metadata</code> table. In turn, the <code>calculate_stats()</code> function calculates other statistics on the data (only correlation implememted).

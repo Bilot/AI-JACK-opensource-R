@@ -155,7 +155,7 @@ The Boston house price data, consisting of ca. 500 rows of indicators of median 
 </p>
 
 <p style='text-align: justify;'>
-Foe each of the datasets, there is also a data types-file available, as well as an unlabelled samples for testing model application.
+For each of the datasets, there is also a data types-file available, as well as an unlabelled samples for testing model application.
 </p>
 
 <br>
@@ -214,6 +214,8 @@ curl --data "param=val1#val2#val3#val4&param2=nam1#nam2#nam3#nam4&param3=f#n#n#f
 <p style='text-align: justify;'>
 The result will be written either to a results table ("output_plumber/predictions.csv") or to SQL database table, depending on the settings.
 </p>
+
+<br>
 
 ## *Techinal details*
 

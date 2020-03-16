@@ -290,8 +290,7 @@ set$odbc$result = list(
   war = "warning_error",
   model = "models",
   imp = "column_importance",
-  val = "validation",
-  val_reg = "validation"
+  val = "validation"
 )
 #Source queries
 set$odbc$query_r <- paste("SELECT * FROM",

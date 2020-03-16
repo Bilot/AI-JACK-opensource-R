@@ -158,6 +158,8 @@ The Boston house price data, consisting of ca. 500 rows of indicators of median 
 Foe each of the datasets, there is also a data types-file available, as well as an unlabelled samples for testing model application.
 </p>
 
+<br>
+
 ## *Web service*
 
 <p style='text-align: justify;'>
@@ -211,4 +213,47 @@ curl --data "param=val1#val2#val3#val4&param2=nam1#nam2#nam3#nam4&param3=f#n#n#f
 
 <p style='text-align: justify;'>
 The result will be written either to a results table ("output_plumber/predictions.csv") or to SQL database table, depending on the settings.
+</p>
+
+## *Techinal details*
+
+### Statistics
+<p style='text-align: justify;'>
+In the workflow, the <code>prep_results()</code> function (among other operations) generates a standard statistical summary of the data, which will be outputted to a <code>metadata</code> table. In turn, the <code>calculate_stats()</code> function calculates other statistics on the data (only correlation implememted).
+</p>
+
+### Transformations
+<p style='text-align: justify;'>
+The following transformation routines are available:
+</p>
+
+- Classify numeric features with missing values (`trans_classifyNa`)  
+- Drop constant features (`trans_delconstant`)  
+- Drop equal (redundant) features (`trans_delequal`)  
+- Replace special characters in nominal features and feature names (`trans_replaceScandAndSpecial`)  
+- Discretise continuous features, based on entropy (`trans_entropy`)
+
+<p style='text-align: justify;'>
+The transformation step is handled by the <code>do_transforms()</code> function, except for <code>trans_entropy</code>, which is call by the <code>entropy_recategorization()</code> function. Recategorised data will be constructed and used in models, if the parameter <code>set$model$discretize</code> is set <code>TRUE</code>. Also, function <code>create_split()</code> will be called in the workflow, if the raw data does not contain a column specifying data split. 
+</p>
+
+### Model algorithmns
+<p style='text-align: justify;'>
+Currently, the following supervised modelling methods are available:
+</p>
+
+- linear models (`glm`) with `h2o.glm`  
+- decision tree (`decdecisionTree`) with `h2o.randomForest` (`n_trees = 1`)  
+- random forest (`randomForest`) with `h2o.randomForest`  
+- gradient boosting (`gbm`) with `h2o.gbm`  
+- extreme gradient boosting (`xgboost`) with `h2o.xgboost`  
+- deep learning (`deeplearning`) with `h2o.deeplearning`  
+- autoML (`automl`) with `h2o.automl`  
+
+<p style='text-align: justify;'>
+In addition, deep learning is also possible to run in unsupervised form, by using it in <code>autoencoder</code> form.
+</p>
+
+<p style='text-align: justify;'>
+The <code>create_models()</code> function handles hyperparameter optimisation (training with <code>train</code>-split and validating with <code>test</code>-split) as well as re-fitting the best model (on both the <code>train</code>- and <code>test</code>-split, except for deep learning).
 </p>

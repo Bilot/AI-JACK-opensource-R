@@ -217,7 +217,7 @@ The result will be written either to a results table ("output_plumber/prediction
 
 <br>
 
-## *Techinal details*
+## *Technical details*
 
 ### Data
 <p style='text-align: justify;'>

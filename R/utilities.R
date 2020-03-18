@@ -281,7 +281,7 @@ set$odbc = list(
 set$odbc$con_string <- "Driver={SQL Server Native Client 11.0};server=XXXXXXX;database=modellingvalidation-dev;Uid=XXXXXXX;Pwd=XXXXXXX;Encrypt=yes"
 
 set$odbc$result = list(
-  prefix = set$main$result_path,
+#  prefix = set$main$result_path,
   exec = "execution",
   coef = "coefficient",
   acc = "accuracy",
@@ -290,8 +290,10 @@ set$odbc$result = list(
   war = "warning_error",
   model = "models",
   imp = "column_importance",
-  val = "validation"
+  val = "validation",
+  val_reg = "validation"
 )
+
 #Source queries
 set$odbc$query_r <- paste("SELECT * FROM",
                           set$odbc$table_r, sep=" ")
@@ -486,7 +488,7 @@ set$read_csv 	<-	list(
   file_sep	=	set$main$file_sep,
   # NA-coding in source
   file_na		=	c("NA", "", "NULL"),
-  # Read with using fread-package?
+  # Read with using fread-function?
   file_fread	=	set$main$file_fread,
   # File decimal separator
   file_dec	=	set$main$file_dec

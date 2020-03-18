@@ -1,6 +1,6 @@
 # BILOT AI-jack DATA WRITE-module
 # (c) Bilot Oy 2020
-# Any user is free to modify this software for their 
+# Any user is free to modify this software for their
 # own needs, bearing in mind that it comes with no warranty.
 
 
@@ -13,10 +13,17 @@
 #' @export
 
 write_db <- function(channel, x, name) {
-    sqlSave(channel, x, tablename = paste(name), append = TRUE,
-        rownames = FALSE, colnames = FALSE, verbose = FALSE,
-        safer = TRUE, addPK = FALSE, fast = TRUE, test = FALSE,
-        nastring = NULL)
+    sqlSave(channel, x,
+            tablename = paste(name),
+            append = TRUE,
+            rownames = FALSE,
+            colnames = FALSE,
+            verbose = FALSE,
+            safer = TRUE,
+            addPK = FALSE,
+            fast = TRUE,
+            test = FALSE,
+            nastring = NULL)
 }
 
 #' Write data to file

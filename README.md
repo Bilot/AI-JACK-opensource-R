@@ -160,6 +160,12 @@ For each of the datasets, there is also a data types-file available, as well as 
 
 <br>
 
+## *Modelling*
+
+The modelling functionality of **AI-jack** rests upon package [`h2o`](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/welcome.html), enabling running H2O from within R. H2O is an open source, in-memory, distributed, fast, and scalable machine learning and predictive analytics platform that allows you to build machine learning models on big data and provides easy productionalization of those models in an enterprise environment.
+
+At present, <b>AI-jack</b> has capabilities for training either classification or regression models. For classification, the logic has been built binary problems in mind, but this can be fairly easily modified. 
+
 ## *Web service*
 
 <p style='text-align: justify;'>

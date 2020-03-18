@@ -166,6 +166,8 @@ The modelling functionality of **AI-jack** rests upon package [`h2o`](http://doc
 
 At present, <b>AI-jack</b> has capabilities for training either classification or regression models. For classification, the logic has been built binary problems in mind, but this can be fairly easily modified. 
 
+<br>
+
 ## *Web service*
 
 <p style='text-align: justify;'>

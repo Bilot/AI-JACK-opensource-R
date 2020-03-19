@@ -112,7 +112,12 @@ After the necessary configurations have been made, a workflow can be executed fr
 Rscript control/main_model.R 
 ```
 
-Again, given that the `config_model.R` has been modified correctly, this should run the model training workflow. 
+Again, given that the `config_model.R` has been modified correctly, this should run the model training workflow. If you're running Windows, you may need to tell where the `Rscript` program is located:
+
+```r
+path\to\Rscript.exe control/main_model.R 
+```
+
 
 ### Data
 <p style='text-align: justify;'>

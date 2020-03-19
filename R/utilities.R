@@ -231,8 +231,8 @@ set$main$write_to_log = FALSE # write logs to file?
 set$main$log_path = "logs"
 set$main$num_cores = parallel::detectCores()-1
 set$main$seed = 1234
-set$main$min_mem_size ="5g"
-set$main$max_mem_size ="7g"
+set$main$min_mem_size = "5g"
+set$main$max_mem_size = "7g"
 
 # (2) FILE CONNECTION PARAMETERS: ----
 # (2.1) Files: ----

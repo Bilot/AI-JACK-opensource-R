@@ -106,11 +106,13 @@ When the parameterisation has been done approprietly, the modeling workflow can 
 One also needs to make sure that the control <code>.R</code>-files are located in the <code>control</code>-folder in the project directory and that the working directory is set to the project directory (this can be set automatically in the workflow, given that the correct path is specified in the settings). 
 </p>
 
-To execute a workflow from command line, simply run the following command in your project path: 
+After the necessary configurations have been made, a workflow can be executed from command line as follows. First, make sure that you're located in the project directory (`cd /path/to/project`). Then simply run the following command in your project path: 
 
 ```r
-Rscript main_model.R 
+Rscript control/main_model.R 
 ```
+
+Again, given that the `config_model.R` has been modified correctly, this should run the model training workflow. 
 
 ### Data
 <p style='text-align: justify;'>

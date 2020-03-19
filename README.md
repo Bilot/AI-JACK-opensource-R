@@ -115,11 +115,22 @@ After the necessary configurations have been made, a workflow can be executed fr
 Rscript control/main_model.R 
 ```
 
-Again, given that the `config_model.R` has been modified correctly, this should run the model training workflow. If you're running Windows, you may need to tell where the `Rscript` program is located:
+Again, given that the `config_model.R` has been modified correctly, this should run the model training workflow.
 
 **Windows**
+If you're running Windows, you may need to tell where the `Rscript` program is located:
+
+**From R**
+To run the workflow from withion `R`, first set the working directory to the project path:
+
 ```r
-path\to\Rscript.exe control\main_model.R 
+setwd('/path/to/project')
+```
+
+Then, just source the workflow script:
+
+```r
+source('control/main_model.R')
 ```
 
 ### Data

@@ -716,7 +716,6 @@ get_datetime <- format(Sys.time(),"%Y_%m_%d_%H_%M")
 
 # (3) Source main settings and functions ----
 source("control/config_model.R")
-setwd(set$main$project_path)
 
 # (4) Start logging ----
 logging_control(set)
@@ -803,7 +802,6 @@ get_datetime <- format(Sys.time(),"%Y_%m_%d_%H_%M")
 
 # (3) Source main settings and functions ----
 source("control/config_apply.R")
-setwd(set$main$project_path)
 
 # (4) Start logging ----
 logging_control(set = set)
@@ -874,8 +872,7 @@ cat(
 rm(list=ls())
 
 # (2) Source main settings and functions ----
-source("config_plumber.r")
-setwd(set$main$project_path)
+source("control/config_plumber.r")
 
 ##########################
 # To make odbc connection to work:

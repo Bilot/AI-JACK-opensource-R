@@ -44,8 +44,11 @@ read_csv <- function(set) {
     path <- paste(set$main$project_path, set$read_csv$file_path,
         sep = "/")
 
-    # If several files, map to 'model_name_part'
+    # If several files, map to 'model_name_part':
     path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
+
+    # If types file has same file format:
+    path <- path[-grep('types',path)]
 
     if (!set$read_csv$file_fread) {
         df <- read.table(file = path, header = T, sep = set$read_csv$file_sep,

@@ -50,6 +50,8 @@ the following command to the system terminal:
 java -version
 ```
 
+If there is no Java installation on your machine, this command should prompt installation. If you have an old version, you probably neet to update it. Java SE Runtime Environment installations can be found <a href="https://www.oracle.com/java/technologies/javase-jre8-downloads.html">here</a>.
+
 <p style='text-align: justify;'>
 To install the <b>AI-jack</b> package, all you need is to run the following command in <b>R</b> (making sure that the `devtools` package has been installed): 
 </p>

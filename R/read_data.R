@@ -113,11 +113,15 @@ read_variabletypes <- function(set, df, odbc_read) {
         }
     } else {
         # Get data path:
-        path <- set$read_variable_types$file_path
+        path <- set$read_variable_types$file_path        
 
         # If several files, map to 'model_name_part'
         if (length(path) > 1){
             path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
+        }
+        # If still several:
+        if (length(path) > 1){
+            path <- path[grep('type',path,ignore.case = T)][1]
         }
 
         # Read types:
@@ -171,8 +175,13 @@ data_read = function(set, odbc) {
         main$raw <- handling_trycatch(read_csv(set))
     }
 
-    if (file.exists(set$read_csv$file_path)) {
-        tmp = strsplit(set$read_csv$file_path, "/")[[1]]
+    path <- paste(set$main$project_path, set$read_csv$file_path,
+        sep = "/")
+    path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
+    path <- path[-grep('type',path,ignore.case = T)]
+
+    if (file.exists(path)) {
+        tmp = strsplit(path, "/")[[1]]
         print(paste0("Source data ", "'", tmp[length(tmp)],
             "'", " loaded."), quote = F)
 

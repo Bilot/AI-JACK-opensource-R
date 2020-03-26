@@ -211,44 +211,47 @@ project_path <- "<PATH TO PROJECT>"
 # (1.1) Input/Output: ----
 set$main <- list(
   project_path = project_path,
-
-	# DATA:
-	use_db = FALSE,
-	label = "<LABEL NAME>",
-	model_name_part = "<PROJECT NAME>",
-	id = "id",
-	test_train_val = "test_train_val",
-	labeliscategory = F,
-
-	# OUTPUT:
-	model_path = "output_model/models",
-	result_path = "output_model/result",
-	append_predicts = FALSE
+  
+  # DATA:
+  use_db = FALSE,
+  label = "<LABEL NAME>",
+  model_name_part = "<PROJECT NAME>",
+  id = "id",
+  test_train_val = "test_train_val",
+  labeliscategory = F,
+  path_sep = "/",
+  
+  # OUTPUT
+  append_predicts = FALSE
 )
 
-# (1.2) Technical: ----
-set$main$write_to_log = FALSE # write logs to file?
-set$main$log_path = "logs"
-set$main$num_cores = parallel::detectCores()-1
-set$main$seed = 1234
-set$main$min_mem_size = "5g"
-set$main$max_mem_size = "7g"
+# (1.3) Output: ----
+set$main$model_path <- paste("output_model","models",sep=set$main$path_sep)
+set$main$result_path <- paste("output_model","result",sep=path_sep)
+
+# (1.3) Technical: ----
+set$main$write_to_log <- FALSE # write logs to file?
+set$main$log_path <- "logs"
+set$main$num_cores <- parallel::detectCores()-1
+set$main$seed <- 1234
+set$main$min_mem_size <- "5g"
+set$main$max_mem_size <- "7g"
 
 # (2) FILE CONNECTION PARAMETERS: ----
 # (2.1) Files: ----
-files = dir(paste(set$main$project_path,"source_model",sep="/"))
-set$main$data_path = paste0("source_model/",grep("csv",files,value = T))
-set$main$type_path = paste0("source_model/",grep("types",files,value = T))
-set$main$file_sep = ";"
-set$main$file_dec = "."
-set$main$file_fread = FALSE
-set$main$file_fwrite = FALSE
+files <- dir(paste(set$main$project_path,"source_model",sep=path_sep))
+set$main$data_path <- paste("source_model",grep("csv",files,value = T),sep=path_sep)
+set$main$type_path <- paste("source_model",grep("types",files,value = T),sep=path_sep)
+set$main$file_sep <- ";"
+set$main$file_dec <- "."
+set$main$file_fread <- FALSE
+set$main$file_fwrite <- FALSE
 
 # (2.2) Variable types: ----
 set$read_variable_types	<-	list(
   # CSV-source column types (path)
   file_path	=	paste(set$main$project_path,
-                    set$main$type_path,sep="/"),
+                    set$main$type_path,sep=set$main$path_sep),
   # Database specific column names (SQL SERVER)
   name_column =	"COLUMN_NAME",
   type_column =	"TYPE_NAME",
@@ -268,7 +271,7 @@ set$odbc = list(
   user_r = "",
   # Source user password
   user_pw_r = "",
-
+  
   # Result server name (models)
   server_m = "localhost",
   database_m = "modellingmetadata",
@@ -281,7 +284,7 @@ set$odbc = list(
 set$odbc$con_string <- "Driver={SQL Server Native Client 11.0};server=XXXXXXX;database=modellingvalidation-dev;Uid=XXXXXXX;Pwd=XXXXXXX;Encrypt=yes"
 
 set$odbc$result = list(
-#  prefix = set$main$result_path,
+  #  prefix = set$main$result_path,
   exec = "execution",
   coef = "coefficient",
   acc = "accuracy",
@@ -495,7 +498,7 @@ set$read_csv 	<-	list(
 )
 # (6.2) Configure result output: ----
 set$csv$result <- list(
-  prefix = paste(set$main$project_path,"output_model/results",sep="/"),
+  prefix = paste(set$main$project_path,"output_model","results",sep=set$main$path_sep),
   exec = "execution",
   coef = "coefficients",
   acc = "accuracy",
@@ -537,47 +540,48 @@ project_path = "<PATH TO PROJECT>"
 # (1.1) Input/Output: ----
 set$main	 	<-	list(
   project_path = project_path,
-
+  
   # DATA:
   use_db = FALSE,
   label = "<LABEL NAME>",
   labeliscategory = T,
   model_name_part = "<PROJECT NAME>",
   id = "id",
-
-  # PATHS:
-  model_path = "output_model/models",
-  model_model_path = "output_model/results",
+  path_sep = "/",
 
   # PREDICTION:
   # which row to use from Model_model-table?
   model_row = 2
 )
 
-# (1.2) Technical: ----
-set$main$write_to_log = FALSE
-set$main$log_path = "logs"
-set$main$num_cores = 1
-set$main$seed = 1234
-set$main$min_mem_size ="3g"
-set$main$max_mem_size ="3g"
+# (1.2) Paths: ----
+set$main$model_path <- paste("output_model","models",sep=set$main$path_sep)
+set$main$model_model_path <- paste("output_model","results",sep=set$main$path_sep)
+
+# (1.3) Technical: ----
+set$main$write_to_log <- FALSE
+set$main$log_path <- "logs"
+set$main$num_cores <- 1
+set$main$seed <- 1234
+set$main$min_mem_size <- "3g"
+set$main$max_mem_size <- "3g"
 
 # (2) FILE CONNECTION PARAMETERS: ----
 # (2.1) Files: ----
-files = dir(paste(set$main$project_path,"source_model",sep="/"))
-set$main$data_path = paste0("source_apply/",grep("csv",files,value = T))
-set$main$type_path = paste0("source_apply/",grep("types",files,value = T))
-set$main$file_sep = ";"
-set$main$file_dec = "."
-set$main$result_path = "results"
-set$main$file_fread = FALSE
-set$main$file_fwrite = FALSE
+files <- dir(paste(set$main$project_path,"source_model",sep=set$main$path_sep))
+set$main$data_path <- paste("source_apply",grep("csv",files,value = T),sep=set$main$path_sep)
+set$main$type_path <- paste("source_apply",grep("types",files,value = T),sep=set$main$path_sep)
+set$main$file_sep <- ";"
+set$main$file_dec <- "."
+set$main$result_path <- "results"
+set$main$file_fread <- FALSE
+set$main$file_fwrite <- FALSE
 
 # (2.2) Variable types: ----
 set$read_variable_types	<-	list(
   # CSV-source column types (path)
   file_path	=	paste(set$main$project_path,
-                    set$main$type_path,sep="/"),
+                    set$main$type_path,sep=set$main$path_sep),
   # Database specific column names (SQL SERVER)
   name_column =	"COLUMN_NAME",
   type_column =	"TYPE_NAME",
@@ -604,7 +608,7 @@ set$read_csv 	<-	list(
 )
 # (4.2) Configure result output: ----
 set$csv$result = list(
-  prefix = paste(set$main$project_path,"output_apply",sep="/"),
+  prefix = paste(set$main$project_path,"output_apply",sep=set$main$path_sep),
   exec = "execution",
   pred = "predictions",
   exec_model = "execution_model",
@@ -640,27 +644,30 @@ set$main <-	list(
   use_db = F,
   id = "id",
   file_sep = ";",
-
+  path_sep = "/",
+  types_name = "<name of types file>",
+  
   # PREDICTION:
   model_row = 2,
-
-  # PATHS:
-  type_path = paste(project_path,"source_model/boston_types.txt",sep="/"),
-  model_path = paste(project_path,"output_model/models",sep="/"),
-  model_name_part = "<PROJECT NAME>",
-  model_model_path = paste(project_path,"output_model/results",sep="/"),
-  model_model_file = "models",
-	log_path = paste(project_path,"logs",sep="/"),
-
-	# COMPUTATION:
-	num_cores = 1,
-	min_mem_size = 3,
-	max_mem_size = 3
+  
+  # COMPUTATION:
+  num_cores = 1,
+  min_mem_size = 3,
+  max_mem_size = 3
 )
 
-# OUTPUT:
-set$write_csv$file_name <- paste(project_path,"output_plumber/predictions.csv",sep="/")
+# PATHS:
+set$main$type_path <- paste(project_path,"source_model",set$main$types_name,sep=set$main$path_sep)
+set$main$model_path <- paste(project_path,"output_model","models",sep=set$main$path_sep)
+set$main$model_name_part <- "<PROJECT NAME>"
+set$main$model_model_path <- paste(project_path,"output_model","results",sep=set$main$path_sep)
+set$main$model_model_file <- "models",
+set$main$log_path = paste(project_path,"logs",sep=set$main$path_sep)
 
+# OUTPUT:
+set$write_csv$file_name <- paste(project_path,"output_plumber","predictions.csv",sep=set$main$path_sep)
+
+# VARIABLE TYPES:
 set$read_variable_types	<-	list(
   # CSV-source column types (path)
   file_path	=	set$main$type_path,
@@ -671,6 +678,7 @@ set$read_variable_types	<-	list(
   types_from_database	=	set$main$use_db
 )
 
+# ODBC:
 set$odbc <- list(
   model_table = "models",
   server_r = "",

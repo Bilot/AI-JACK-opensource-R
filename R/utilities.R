@@ -980,8 +980,9 @@ prep_results <- function(set, main, odbc) {
 logging_control <- function(set) {
 
   if (set$main$write_to_log) {
-    log_file <- file(paste(set$main$project_path, "/",
-                           set$main$log_path, "/log_modelling_", get_datetime,
+    log_file <- file(paste(set$main$project_path, set$main$path_sep,
+                           set$main$log_path,set$main$path_sep, 
+                           "log_modelling_", get_datetime,
                            ".txt", sep = ""), open = "wt")
     sink(log_file, type = "message")
     target <- ifelse(set$main$use_db, "DB", "file")
@@ -1187,7 +1188,7 @@ clear_model_results = function(result_path = NULL){
 
   # Loop through tables:
   for(ii in dir(path)){
-    nam = paste0(path,'/',ii)
+    nam = paste0(path,set$main$path_sep,ii)
     x = read.csv2(nam,nrow = 1)
     write.csv2(x[-1,],file = nam,row.names = FALSE)
   }
@@ -1215,7 +1216,7 @@ collect_results = function(result_path,executionid,
   eid = executionid
 
   results = lapply(nam,function(x){
-    df <- readr::read_csv2(paste0(result_path,'/',nam[2]))
+    df <- readr::read_csv2(paste0(result_path,set$main$path_sep,nam[2]))
     return(df[df$executionid %in% eid,])
   })
   return(results)

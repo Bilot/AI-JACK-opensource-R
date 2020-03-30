@@ -320,15 +320,16 @@ entropy_recategorization = function(main, set, prep) {
       factor_levels_disc <- lev[!(lev %in% factor_levels)]
 
       # Save cutpoints:
-      path = paste(set$main$project_path, "output_model/",
-                   sep = "/")
+      path = paste(set$main$project_path, "output_model",set$main$path_sep,
+                   sep = set$main$path_sep)
       saveRDS(main$recategorized$value$cutpoints,
-              file = paste0(path, "discretization/",
+              file = paste0(path, "discretization",set$main$path_sep,
                             prep$runid, "_", set$main$model_name_part,
                             "_", set$main$label, "_", "cutpoints.rds"))
       # Save factor_levels_disc:
       saveRDS(factor_levels_disc, file = paste0(path,
-                                                "discretization/", prep$runid, "_", set$main$model_name_part,
+                                                "discretization",set$main$path_sep, prep$runid, "_", 
+                                                set$main$model_name_part,
                                                 "_", set$main$label, "_", "factor_levels_disc.rds"))
 
     } else {

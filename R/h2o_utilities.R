@@ -261,11 +261,11 @@ export_model_output <- function(models, output, set, prep, odbc){
     # (2.1) Export performance: ----
     write_csv(set, output$model_fit_measures,
               paste(set$csv$result$prefix,
-                    set$csv$result$acc,sep='/'), append = T)
+                    set$csv$result$acc,sep=set$main$path_sep), append = T)
     # (2.2) Export application table: ----
     write_csv(set, output$apply_model,
               paste(set$csv$result$prefix,
-                    set$csv$result$model,sep='/'), append = T)
+                    set$csv$result$model,sep=set$main$path_sep), append = T)
     # (2.3) Export predictions: ----
     # choose target table based on label type
     #target <- ifelse(set$main$labeliscategory,
@@ -282,14 +282,14 @@ export_model_output <- function(models, output, set, prep, odbc){
     #}
     write_csv(set, output$predictions,
               paste(set$csv$result$prefix,
-                    set$csv$result$val,sep='/'),
+                    set$csv$result$val,sep=set$main$path_sep),
               append = set$main$append_predicts,
               colnames = c('executionid','model_name',"row_identifier",'obs','pred','proba'))
     # (2.4) Export regression coefficients: ----
     if(length(output$coefficients) > 0){
       write_csv(set, output$coefficients,
                 paste(set$csv$result$prefix,
-                      set$csv$result$coef, sep='/'),
+                      set$csv$result$coef, sep=set$main$path_sep),
                 append = TRUE)
       #,colnames = c('executionid','label','model_name',"variable",'coef'))
     }
@@ -297,28 +297,30 @@ export_model_output <- function(models, output, set, prep, odbc){
     if(length(output$feature_importance) > 0){
       write_csv(set, output$feature_importance,
                 paste(set$csv$result$prefix,
-                      set$csv$result$imp,sep='/'),
+                      set$csv$result$imp,sep=set$main$path_sep),
                 append = TRUE)
     }
   }
 
   # (3) Save factor levels: ----
-  loc <- paste0(set$main$project_path,"/output_model/factor_levels/",
+  loc <- paste0(set$main$project_path,set$main$path_sep,"output_model",
+                set$main$path_sep,"factor_levels",set$main$path_sep,
                 paste(prep$runid,set$main$model_name_part,set$main$label,
                       'factorLevels.rds',sep='_'))
   saveRDS(output$factor_levels, file = loc)
 
   # (4) Save model parameters: ----
-  loc <- paste0(set$main$project_path,"/output_model/parameters/",
+  loc <- paste0(set$main$project_path,set$main$path_sep,"output_model",
+                set$main$path_sep,"parameters",set$main$path_sep,
                 paste(prep$runid,set$main$model_name_part,set$main$label,
                       'parameters.rds',sep='_'))
   saveRDS(output$parameters, file = loc)
 
   # (5) Save models to MOJO: ----
-  path = paste(set$main$project_path,set$main$model_path,sep="/")
+  path = paste(set$main$project_path,set$main$model_path,sep=set$main$path_sep)
   for(ii in names(models)){
-    test <- file.exists(paste0(set$main$model_path,
-                               '/h2o-genmodel.jar'))
+    test <- file.exists(paste0(set$main$model_path,set$main$path_sep,
+                               'h2o-genmodel.jar'))
     gwt_jar <- ifelse(test,FALSE,TRUE)
 
     h2o.download_mojo(model = models[[ii]],

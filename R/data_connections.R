@@ -76,7 +76,7 @@ csv_preparations <- function(set, main) {
     variable_types <- main$with_types$value$Variable_types
     df <- main$with_types$value$Data_with_types
     sep = ifelse(grepl("/$", set$csv$result$prefix), "",
-        "/")
+        set$main$path_sep)
     path <- paste0(set$csv$result$prefix, sep, set$csv$result$exec,
         ".csv")
 
@@ -91,7 +91,7 @@ csv_preparations <- function(set, main) {
 
     # (2) Get tables: ----
     path <- paste(set$main$project_path, set$read_csv$file_path,
-        sep = "/")
+        sep = set$main$path_sep)
     # If several files, map to 'model_name_part'
     path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
 

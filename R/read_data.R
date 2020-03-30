@@ -42,7 +42,7 @@ read_csv <- function(set) {
 
     # Get data path:
     path <- paste(set$main$project_path, set$read_csv$file_path,
-        sep = "/")
+        sep = set$main$path_sep)
 
     # If several files, map to 'model_name_part':
     path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
@@ -176,12 +176,12 @@ data_read = function(set, odbc) {
     }
 
     path <- paste(set$main$project_path, set$read_csv$file_path,
-        sep = "/")
+        sep = set$main$path_sep)
     path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
     path <- path[-grep('type',path,ignore.case = T)]
 
     if (file.exists(path)) {
-        tmp = strsplit(path, "/")[[1]]
+        tmp = strsplit(path, set$main$path_sep)[[1]]
         print(paste0("Source data ", "'", tmp[length(tmp)],
             "'", " loaded."), quote = F)
 

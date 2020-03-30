@@ -119,7 +119,7 @@ read_variabletypes <- function(set, df, odbc_read) {
     if (set$read_variable_types$types_from_database) {
         variable_types <- sqlColumns(odbc_read, set$odbc$table_r)
         for (i in variable_types[, set$read_variable_types$name_column]) {
-            df[, i] <- .set_type(variable_types, i, df[,
+            df[, i] <- set_type(variable_types, i, df[,
                 i], set)
         }
     } else {

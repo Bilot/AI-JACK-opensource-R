@@ -227,7 +227,7 @@ set$main <- list(
 
 # (1.3) Output: ----
 set$main$model_path <- paste("output_model","models",sep=set$main$path_sep)
-set$main$result_path <- paste("output_model","result",sep=path_sep)
+set$main$result_path <- paste("output_model","result",sep=set$main$path_sep)
 
 # (1.3) Technical: ----
 set$main$write_to_log <- FALSE # write logs to file?
@@ -239,9 +239,9 @@ set$main$max_mem_size <- "7g"
 
 # (2) FILE CONNECTION PARAMETERS: ----
 # (2.1) Files: ----
-files <- dir(paste(set$main$project_path,"source_model",sep=path_sep))
-set$main$data_path <- paste("source_model",grep("csv",files,value = T),sep=path_sep)
-set$main$type_path <- paste("source_model",grep("types",files,value = T),sep=path_sep)
+files <- dir(paste(set$main$project_path,"source_model",sep=set$main$path_sep))
+set$main$data_path <- paste("source_model",grep("csv",files,value = T),sep=set$main$path_sep)
+set$main$type_path <- paste("source_model",grep("types",files,value = T),sep=set$main$path_sep)
 set$main$file_sep <- ";"
 set$main$file_dec <- "."
 set$main$file_fread <- FALSE

@@ -35,7 +35,7 @@ plumber_predict <- function(df, set, param, param2, param3, odbc){
     ID = as.vector(df[, set$main$id]), 
     pred = h2o.mojo_predict_df(
       frame = df, 
-      mojo_zip_path = paste0(set$main$model_path,'/',
+      mojo_zip_path = paste0(set$main$model_path,set$main$path_sep,
                              apply_models$model_name,'.zip')), 
     model_name = apply_models$model_name, 
     predtime = "default", 

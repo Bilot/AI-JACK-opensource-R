@@ -80,6 +80,7 @@ read_csv <- function(set) {
 #' @return data.frame column
 #'
 #' @export
+
 set_type <- function(types, column_name, df_i, set) {
     if (types[types[, set$read_variable_types$name_column] ==
         column_name, ][, set$read_variable_types$type_column] %in%

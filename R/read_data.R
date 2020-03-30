@@ -69,7 +69,6 @@ read_csv <- function(set) {
     return(df)
 }
 
-
 #' Set data types
 #'
 #' @param types data.frame with variable types

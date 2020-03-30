@@ -23,7 +23,7 @@ plumber_predict <- function(df, set, param, param2, param3, odbc){
     apply_models<-sqlQuery(odbc$odbc_metadata_azuredb, set$odbc$query_r)	
   }
   if(set$main$use_db==F) {
-    apply_models <- read.csv2(paste(set$main$model_model_path,'/', 
+    apply_models <- read.csv2(paste(set$main$model_model_path,set$main$path_sep, 
                                    set$main$model_model_file, 
                                    ".csv", sep=""))
     apply_models$apply[set$main$model_row] = 1

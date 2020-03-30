@@ -74,7 +74,7 @@ read_csv <- function(set) {
 #' @param types data.frame with variable types
 #' @param column_name name of variable to be set
 #' @param df_i column in data.frame to be set
-#' @set set config object
+#' @param set config object
 #' 
 #' @return data.frame column
 #'

@@ -15,7 +15,7 @@ trans_classifyNa(df, set)
 main object with transformed data.
 }
 \description{
-This module is used, when there is too much NA's in
+This function is used, when there is too much NA's in
 continuous variables and you can't impute them.
 This replaces negative values with \code{'Under0'}, zeros with \code{'0'},
 positive values with \code{'Over0'} and NA's with \code{'Missing'} and

@@ -69,7 +69,18 @@ read_csv <- function(set) {
     return(df)
 }
 
-.set_type <- function(types, column_name, df_i, set) {
+
+#' Set data types
+#'
+#' @param types data.frame with variable types
+#' @param column_name name of variable to be set
+#' @param df_i column in data.frame to be set
+#' @set set config object
+#' 
+#' @return data.frame column
+#'
+#' @export
+set_type <- function(types, column_name, df_i, set) {
     if (types[types[, set$read_variable_types$name_column] ==
         column_name, ][, set$read_variable_types$type_column] %in%
         c("bigint identity", "char") || column_name %in%
@@ -143,7 +154,7 @@ read_variabletypes <- function(set, df, odbc_read) {
         }
 
         for (i in variable_types[, set$read_variable_types$name_column]) {
-            df[, i] <- .set_type(variable_types, i, df[,
+            df[, i] <- set_type(variable_types, i, df[,
                 i], set)
         }
     }

@@ -15,7 +15,7 @@
 #' @export
 
 list_models = function(model_path){
-  sep = ifelse(grepl('/$',model_path),'',set$main$path_sep)
+  sep = ifelse(grepl('/$',model_path),"","/")
   print(
     read.csv2(paste0(model_path,sep,'models.csv'))
   )
@@ -107,15 +107,16 @@ create_predictions <- function(df, set, prep,
 
   # (4) MAKE PREDICTIONS: ----
   if(useMOJO){
-    path = paste(set$main$project_path,set$main$model_path,sep=set$main$path_sep)
+    path = paste(set$main$project_path,
+                 set$main$model_path,
+                 sep=set$main$path_sep)
     names <- grep('.zip',dir(path),value = T)
     use <- grep(apply_models$model_name,names,value = T)
     if(length(use)==0){
-      get_package('stringdist')
       use = names(
         which.max(
           sapply(names,function(x){
-            stringdist(apply_models$model_name,x)
+            stringdist::stringdist(apply_models$model_name,x)
           })
         )
       )

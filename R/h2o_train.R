@@ -293,6 +293,37 @@ train_automl_model <- function(df, set, runid){
   return(best_models)
 }
 
+#' Training a anomaly detection model, using isolationForest
+#'
+#' @param model_name model_id
+#' @param h2o_data list of H2OFFrames
+#' @param set config object
+#'
+#' @return isolationForest model
+#'
+#' @export
+
+train_isoforest_model <- function(model_name, h2o_data, set){
+  
+  predictors <- setdiff(names(h2o_data$train),set$model$cols_not_included)
+  params <- set$anomaly$isoForest
+  
+  model = h2o.isolationForest(
+    training_frame = h2o_data$full_train,
+    x = predictors,
+    model_id = model_name,
+    max_depth = params$max_depth,
+    ntrees = params$ntrees,
+    mtries = params$mtries,
+    sample_rate = params$sample_rate,
+    stopping_tolerance = params$stopping_tolerance,
+    stopping_rounds = params$stopping_rounds,
+    stopping_metric = params$stopping_metric
+  )
+  
+  return(model)
+}
+
 # SCORING: -----
 
 #' Scoring models

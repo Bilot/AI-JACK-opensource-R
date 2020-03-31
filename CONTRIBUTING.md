@@ -54,9 +54,10 @@ As we would like to review your pull request as quickly and smoothly as possible
 * Test your code on the sample data from repository.
 * If you are fixing a bug, link to the issue describing this bug.
 * If you are improving performance, what are quantitative benefits (reduced time, memory use etc.) from this enhancement? 
-* Describe what have you changed.
+* Describe what have you changed. Note that this may require updating README as well to update our manual. Use labels!
 * Mention any possible drawbacks/inconveniences that your change may imply.
-* After you submit your pull request, verify that all [status checks](https://help.github.com/articles/about-status-checks/) are passing <details><summary>What if the status checks are failing?</summary>If a status check is failing, and you believe that the failure is unrelated to your change, please leave a comment on the pull request explaining why you believe the failure is unrelated. A maintainer will re-run the status check for you. If we conclude that the failure was a false positive, then we will open an issue to track that problem with our status check suite.</details>
+* Ensure any install or build dependencies are removed before the end of the layer when doing a build.
+* Most importantly, verify that all [status checks](https://help.github.com/articles/about-status-checks/) are passing. In case they are not and you are not able to find any mistake in your change, please leave a comment with details.
 
 While the prerequisites above must be satisfied prior to having your pull request reviewed, the reviewer(s) may ask you to complete additional design work, tests, or other changes before your pull request can be ultimately accepted.
 

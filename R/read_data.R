@@ -47,9 +47,6 @@ read_csv <- function(set) {
     # If several files, map to 'model_name_part':
     path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
 
-    # If types file has same file format:
-    path <- path[-grep('types',path)]
-
     if (!set$read_csv$file_fread) {
         df <- read.table(file = path, header = T, sep = set$read_csv$file_sep,
             dec = set$read_csv$file_dec, na.strings = set$read_csv$file_na,
@@ -183,38 +180,33 @@ data_read = function(set, odbc) {
         main$raw <- handling_trycatch(read_db(set$odbc$query_r,
             odbc$value$odbc_source))
     } else {
-        main$raw <- handling_trycatch(read_csv(set))
-    }
-
-    path <- paste(set$main$project_path, set$read_csv$file_path,
-        sep = set$main$path_sep)
-    path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
-    if(any(grepl('type',path))){
-        path <- path[-grep('type',path,ignore.case = T)]
+        path <- paste(set$main$project_path, set$read_csv$file_path,
+                      sep = set$main$path_sep)
+        path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
+        
+        if (file.exists(path)) {
+            main$raw <- handling_trycatch(read_csv(set))
+            
+            tmp = strsplit(path, set$main$path_sep)[[1]]
+            print(paste0("Source data ", "'", tmp[length(tmp)],
+                         "'", " loaded."), quote = F)
+        } else {
+            stop("ERROR: file not found")
+        }
+        
     }
     
-    if (file.exists(path)) {
-        tmp = strsplit(path, set$main$path_sep)[[1]]
-        print(paste0("Source data ", "'", tmp[length(tmp)],
-            "'", " loaded."), quote = F)
-
-        # (2) Add var-types: ----
-        if (set$main$use_db) {
-            main$with_types <- handling_trycatch(
-                read_variabletypes(set,
-                main$raw$value, odbc$value$odbc_source))
-        } else {
-            main$with_types <- handling_trycatch(
-                read_variabletypes(set,
-                main$raw$value, NULL))
-        }
-        print("Variable types defined.", quote = F)
-
-        print_time(start)
-
-        return(main)
-
+    # (2) Add var-types: ----
+    if (set$main$use_db) {
+        main$with_types <- handling_trycatch(
+            read_variabletypes(set,
+            main$raw$value, odbc$value$odbc_source))
     } else {
-        stop("ERROR: file not found")
+        main$with_types <- handling_trycatch(
+            read_variabletypes(set,
+            main$raw$value, NULL))
     }
+    print("Variable types defined.", quote = F)
+    print_time(start)
+    return(main)
 }

@@ -241,6 +241,9 @@ set$main$max_mem_size <- "7g"
 # (2.1) Files: ----
 files <- dir(paste(set$main$project_path,"source_model",sep=set$main$path_sep))
 set$main$data_path <- paste("source_model",grep("csv",files,value = T),sep=set$main$path_sep)
+if(any(grepl("type",set$main$data_path))){
+    set$main$data_path <- set$main$data_path[-grep("type",set$main$data_path,ignore.case = T)]
+}
 set$main$type_path <- paste("source_model",grep("types",files,value = T),sep=set$main$path_sep)
 set$main$file_sep <- ";"
 set$main$file_dec <- "."
@@ -570,6 +573,9 @@ set$main$max_mem_size <- "3g"
 # (2.1) Files: ----
 files <- dir(paste(set$main$project_path,"source_model",sep=set$main$path_sep))
 set$main$data_path <- paste("source_apply",grep("csv",files,value = T),sep=set$main$path_sep)
+if(any(grepl("type",set$main$data_path))){
+    set$main$data_path <- set$main$data_path[-grep("type",set$main$data_path,ignore.case = T)]
+}
 set$main$type_path <- paste("source_apply",grep("types",files,value = T),sep=set$main$path_sep)
 set$main$file_sep <- ";"
 set$main$file_dec <- "."

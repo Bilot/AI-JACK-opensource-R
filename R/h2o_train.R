@@ -318,7 +318,8 @@ train_isoforest_model <- function(model_name, h2o_data, set){
     sample_rate = params$sample_rate,
     stopping_tolerance = params$stopping_tolerance,
     stopping_rounds = params$stopping_rounds,
-    stopping_metric = params$stopping_metric
+    stopping_metric = params$stopping_metric,
+    score_tree_interval = params$score_tree_interval
   )
   
   return(model)
@@ -469,19 +470,41 @@ create_models <- function(set,main,prep,odbc){
 
   # (2.1) Train models: ----
   best_models = list()
-  if(to_train != 'automl'){
-    for(estimator in set$model$train_models){
-      print(paste0('   Building ',estimator,' model...'),
-            quote = F)
-      model <- optimize_h2o_model(df = h2o_data, set = set,
-                                  estimator = estimator,
-                                  runid = prep$runid)
-      best_models[[model$best_model@model_id]] <- model
+  # Train single-estimator superviser models:
+  for(estimator in set$model$train_models){
+    if(estimator %in% c('automl','isoForest')){
+      next()
     }
-  }else{
+    print(paste0('   Building ',estimator,' model...'),
+          quote = F)
+    model <- optimize_h2o_model(df = h2o_data, set = set,
+                                estimator = estimator,
+                                runid = prep$runid)
+    best_models[[model$best_model@model_id]] <- model
+  }
+  
+  # Train autoML models:
+  if(to_train == 'automl'){
     best_models <- train_automl_model(df = h2o_data,
                                       set = set,
                                       runid = prep$runid)
+  }
+  
+  # Train anomaly models:
+  if('isoForest' %in% to_train){
+    model_id <- paste(prep$runid,
+                     set$main$model_name_part,
+                     set$main$label, 'isoForest',
+                     get_datetime, sep="_")
+    model <- list()
+    model$best_model <- train_isoforest_model(
+      model_name = model_id,
+      h2o_data = h2o_data,
+      set = set)
+    score <- h2o.predict(model$best_model,
+                         h2o_data$val)
+    model$score = list(Mean_error = mean(score$predict))
+    best_models[[model$best_model@model_id]] <- model
   }
 
 

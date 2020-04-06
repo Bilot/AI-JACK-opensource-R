@@ -111,7 +111,7 @@ create_df <- function(param, param2, param3){
 #' @export
 parse_params <- function(file_path,row = 1,set){
   line <- suppressWarnings(
-    read.table('test_line.csv',header = T,sep = set$main$file_sep,
+    read.table(file_path,header = T,sep = set$main$file_sep,
                stringsAsFactors = F)
   )[row,]
   param <- paste0("param=",paste(line,collapse = '#'))

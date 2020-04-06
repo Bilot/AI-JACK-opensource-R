@@ -415,6 +415,7 @@ selection = c("delete_equal", "clean_special",
       X = main$special_replaced$value
     } else {
       if ("delete_equal" %in% selection) {
+        X = main$equal_deleted$value$Data_del_equal
       } else {
         X = main$with_types$value$Data_with_types
       }
@@ -437,6 +438,7 @@ selection = c("delete_equal", "clean_special",
         X = main$special_replaced$value
       } else {
         if ("delete_equal" %in% selection) {
+          X = main$equal_deleted$value$Data_del_equal
         } else {
           X = main$with_types$value$Data_with_types
         }

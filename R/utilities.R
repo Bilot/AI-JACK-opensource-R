@@ -485,6 +485,36 @@ set$model$automl <- list(
   exclude = c("GLM","GBM","DRF","StackedEnsemble")
 )
 
+# (5.3) Anomaly Detection Parameters: ----
+set$anomaly <- list()
+set$anomaly$isoForest <- list(
+  ntrees = 100,
+  max_depth = 6,
+  max_runtime_secs = 30,
+  seed = 4556,
+  mtries = -1,
+  sample_rate = 0.2,
+  categorical_encoding = "AUTO",
+  stopping_rounds = 5,
+  stopping_metric = "MSE",
+  stopping_tolerance = 0.01,
+  score_tree_interval = 10
+)
+set$anomaly$autoencoder <- list(
+  activation = "Tanh",
+  hidden = c(50,20,5,20,50),
+  epochs = 100,
+  seed = 4556,
+  adaptive_rate = TRUE,
+  loss = "Automatic",
+  distribution = "AUTO",
+  stopping_rounds = 5,
+  stopping_metric = "MSE",
+  stopping_tolerance = 0.01,
+  shuffle_training_data = TRUE,
+  missing_values_handling = "Skip"
+)
+
 # (6) CSV Connection Parameters: ----
 # (6.1) Configure data read: ----
 set$read_csv 	<-	list(

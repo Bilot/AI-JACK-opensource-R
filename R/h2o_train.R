@@ -325,6 +325,43 @@ train_isoforest_model <- function(model_name, h2o_data, set){
   return(model)
 }
 
+#' Training a anomaly detection model, using autoencoder network
+#'
+#' @param model_name model_id
+#' @param h2o_data list of H2OFFrames
+#' @param set config object
+#'
+#' @return autoencoder model
+#'
+#' @export
+
+train_autoencoder_model <- function(model_name, h2o_data, set){
+  
+  # (1) Make data: ----
+  x_train <- h2o_data$full_train
+  x_val <- h2o_data$val
+  
+  x <- setdiff(names(x_train),set$model$cols_not_included)
+  params <- set$anomaly$autoencoder
+  
+  model <- h2o.deeplearning(
+    x = x,
+    model_id = model_name,
+    training_frame = x_train,
+    validation_frame = x_val,
+    hidden = params$hidden,
+    epochs = params$epochs,
+    adaptive_rate = params$adaptive_rate,
+    stopping_tolerance = params$stopping_tolerance,
+    stopping_rounds = params$stopping_rounds,
+    stopping_metric = params$stopping_metric,
+    activation = params$activation,
+    autoencoder = TRUE
+  )
+  
+  return(model)
+}
+
 # SCORING: -----
 
 #' Scoring models
@@ -492,6 +529,7 @@ create_models <- function(set,main,prep,odbc){
   
   # Train anomaly models:
   if('isoForest' %in% to_train){
+    print('   Building isolationForest model...',quote = F)
     model_id <- paste(prep$runid,
                      set$main$model_name_part,
                      set$main$label, 'isoForest',
@@ -504,6 +542,20 @@ create_models <- function(set,main,prep,odbc){
     score <- h2o.predict(model$best_model,
                          h2o_data$val)
     model$score = list(Mean_error = mean(score$predict))
+    best_models[[model$best_model@model_id]] <- model
+  }
+  if('autoencoder' %in% to_train){
+    print('   Building autoencoder model...',quote = F)
+    model_id <-paste(runid,set$main$model_name_part,
+                     set$main$label, 'autoencoder',
+                     get_datetime, sep="_")
+    model <- list()
+    model$best_model <- train_autoencoder_model(
+      model_name = model_id,
+      h2o_data = h2o_data,
+      set = set)
+    
+    model$score = list(MSE = h2o.mse(model$best_model))
     best_models[[model$best_model@model_id]] <- model
   }
 

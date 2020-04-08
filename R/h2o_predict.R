@@ -29,6 +29,9 @@ list_models = function(model_path){
 #' @param apply_models row specifying applied model
 #' @param odbc ODBC connection config
 #' @param odbc_pred ODBC connection config for model application
+#' @param useMOJO whether to use MOJO-models or H2O-formated 
+#' models (default = TRUE. At present, storing H2O-models is 
+#' disabled in the \code{export_model_output} function).
 #'
 #' @return model predictions
 #'
@@ -51,7 +54,6 @@ create_predictions <- function(df, set, prep,
                           'tree',"AutoML",'xgboost'),
                         function(x) grepl(x,apply_models$model_name,
                                           ignore.case = T)))
-
 
   # (2) FACTOR LEVELS: ----
   # (2.1) Get levels ----

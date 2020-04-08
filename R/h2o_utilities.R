@@ -152,6 +152,9 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
   }
 
   nam <- names(models)
+  
+  # update test:
+  test <- test | grepl('isoForest',names(models),ignore.case = T)
   varimp <- foreach(ii = nam[!test], .combine = rbind)%do%{
     x = models[[ii]]
     data.frame(executionid = runid,
@@ -162,7 +165,10 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
   }
 
   # (3) Predict for valid-set: ----
-  pred_val <- foreach(ii = names(models), .combine = rbind)%do%{
+  # (3.1) Other than anomaly detection: ----
+  anomaly <- grep('isoForest',names(models),value = T)
+  nam <- setdiff(names(models),anomaly)
+  pred_val <- foreach(ii = nam, .combine = rbind)%do%{
     x = models[[ii]]
     preds = h2o.predict(x, newdata = h2o_data$val)
     data.frame(
@@ -173,12 +179,31 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
       pred = as.vector(preds$predict),
       proba = round(as.vector(ifelse(is.factor(h2o_data$val[,label]),
                                      preds[,3],NA)),3),
-      row.names = NULL
+      row.names = NULL,
+      stringsAsFactors = F
     )
   }
+  
+  # (3.2) Anomaly detection: ----
+  vals <- foreach(ii = anomaly, .combine = rbind)%do%{
+    x = models[[ii]]
+    preds = h2o.predict(x, newdata = h2o_data$val)
+    data.frame(
+      executionid = as.numeric(runid),
+      model_name = ids[ii],
+      row_identifier = as.vector(h2o_data$val[, set$main$id]),
+      obs = NA,
+      pred = as.vector(preds$mean_length),
+      proba = as.vector(preds$predict),
+      row.names = NULL,
+      stringsAsFactors = F
+    )
+  }
+  pred_val <- rbind(pred_val,vals)
 
   # (4) Calculate model fitting/accuracy measures: ----
-  perf <- foreach(ii = names(models),.combine = rbind) %do% {
+  # (4.1) Other than anomaly detection: ----
+  perf <- foreach(ii = nam,.combine = rbind) %do% {
     sets = c('train','test','val')
     perf <- lapply(sets, function(x){
       perf = tryCatch(
@@ -193,12 +218,18 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
     names(perf) <- paste0('value_',sets)
     return(perf)
   }
+  
+  # (4.2) Anomaly detection: ----
+  sets = c('train','test','val')
+  tmp <- perf[1:length(anomaly),]
+  tmp[1:length(anomaly),] <- NA
+  perf <- rbind(perf,tmp)
 
   model_fit_measures <- data.frame(
     executionid = as.numeric(runid),
     time = time,
     label = label,
-    model_name = model_names,
+    model_name = names(models),
     metric = metric,
     perf,
     notions = '',

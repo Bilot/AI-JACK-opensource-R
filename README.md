@@ -275,7 +275,7 @@ The following transformation routines are available:
 The transformation step is handled by the <code>do_transforms()</code> function, except for <code>trans_entropy</code>, which is call by the <code>entropy_recategorization()</code> function. Recategorised data will be constructed and used in models, if the parameter <code>set$model$discretize</code> is set <code>TRUE</code>. Also, function <code>create_split()</code> will be called in the workflow, if the raw data does not contain a column specifying data split. 
 </p>
 
-### Model algorithmns
+### Model algorithms
 <p style='text-align: justify;'>
 Currently, the following supervised modelling methods are available:
 </p>

@@ -23,7 +23,8 @@ plumber_predict <- function(df, set, param, param2, param3, odbc){
     apply_models<-sqlQuery(odbc$odbc_metadata_azuredb, set$odbc$query_r)	
   }
   if(set$main$use_db==F) {
-    apply_models <- read.csv2(paste(set$main$model_model_path,'/', 
+    apply_models <- read.csv2(paste(set$main$model_model_path,
+                                   set$main$path_sep, 
                                    set$main$model_model_file, 
                                    ".csv", sep=""))
     apply_models$apply[set$main$model_row] = 1
@@ -35,7 +36,7 @@ plumber_predict <- function(df, set, param, param2, param3, odbc){
     ID = as.vector(df[, set$main$id]), 
     pred = h2o.mojo_predict_df(
       frame = df, 
-      mojo_zip_path = paste0(set$main$model_path,'/',
+      mojo_zip_path = paste0(set$main$model_path,set$main$path_sep,
                              apply_models$model_name,'.zip')), 
     model_name = apply_models$model_name, 
     predtime = "default", 
@@ -110,7 +111,7 @@ create_df <- function(param, param2, param3){
 #' @export
 parse_params <- function(file_path,row = 1,set){
   line <- suppressWarnings(
-    read.table('test_line.csv',header = T,sep = set$main$file_sep,
+    read.table(file_path,header = T,sep = set$main$file_sep,
                stringsAsFactors = F)
   )[row,]
   param <- paste0("param=",paste(line,collapse = '#'))

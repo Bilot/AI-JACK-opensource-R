@@ -42,9 +42,9 @@ read_csv <- function(set) {
 
     # Get data path:
     path <- paste(set$main$project_path, set$read_csv$file_path,
-        sep = "/")
+        sep = set$main$path_sep)
 
-    # If several files, map to 'model_name_part'
+    # If several files, map to 'model_name_part':
     path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
 
     if (!set$read_csv$file_fread) {
@@ -66,7 +66,18 @@ read_csv <- function(set) {
     return(df)
 }
 
-.set_type <- function(types, column_name, df_i, set) {
+#' Set data types
+#'
+#' @param types data.frame with variable types
+#' @param column_name name of variable to be set
+#' @param df_i column in data.frame to be set
+#' @param set config object
+#' 
+#' @return data.frame column
+#'
+#' @export
+
+set_type <- function(types, column_name, df_i, set) {
     if (types[types[, set$read_variable_types$name_column] ==
         column_name, ][, set$read_variable_types$type_column] %in%
         c("bigint identity", "char") || column_name %in%
@@ -105,16 +116,20 @@ read_variabletypes <- function(set, df, odbc_read) {
     if (set$read_variable_types$types_from_database) {
         variable_types <- sqlColumns(odbc_read, set$odbc$table_r)
         for (i in variable_types[, set$read_variable_types$name_column]) {
-            df[, i] <- .set_type(variable_types, i, df[,
+            df[, i] <- set_type(variable_types, i, df[,
                 i], set)
         }
     } else {
         # Get data path:
-        path <- set$read_variable_types$file_path
+        path <- set$read_variable_types$file_path        
 
         # If several files, map to 'model_name_part'
         if (length(path) > 1){
             path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
+        }
+        # If still several:
+        if (length(path) > 1){
+            path <- path[grep('type',path,ignore.case = T)][1]
         }
 
         # Read types:
@@ -136,7 +151,7 @@ read_variabletypes <- function(set, df, odbc_read) {
         }
 
         for (i in variable_types[, set$read_variable_types$name_column]) {
-            df[, i] <- .set_type(variable_types, i, df[,
+            df[, i] <- set_type(variable_types, i, df[,
                 i], set)
         }
     }
@@ -165,31 +180,33 @@ data_read = function(set, odbc) {
         main$raw <- handling_trycatch(read_db(set$odbc$query_r,
             odbc$value$odbc_source))
     } else {
-        main$raw <- handling_trycatch(read_csv(set))
-    }
-
-    if (file.exists(set$read_csv$file_path)) {
-        tmp = strsplit(set$read_csv$file_path, "/")[[1]]
-        print(paste0("Source data ", "'", tmp[length(tmp)],
-            "'", " loaded."), quote = F)
-
-        # (2) Add var-types: ----
-        if (set$main$use_db) {
-            main$with_types <- handling_trycatch(
-                read_variabletypes(set,
-                main$raw$value, odbc$value$odbc_source))
+        path <- paste(set$main$project_path, set$read_csv$file_path,
+                      sep = set$main$path_sep)
+        path <- path[grep(set$main$model_name_part,path,ignore.case = T)]
+        
+        if (file.exists(path)) {
+            main$raw <- handling_trycatch(read_csv(set))
+            
+            tmp = strsplit(path, set$main$path_sep)[[1]]
+            print(paste0("Source data ", "'", tmp[length(tmp)],
+                         "'", " loaded."), quote = F)
         } else {
-            main$with_types <- handling_trycatch(
-                read_variabletypes(set,
-                main$raw$value, NULL))
+            stop("ERROR: file not found")
         }
-        print("Variable types defined.", quote = F)
-
-        print_time(start)
-
-        return(main)
-
-    } else {
-        stop("ERROR: file not found")
+        
     }
+    
+    # (2) Add var-types: ----
+    if (set$main$use_db) {
+        main$with_types <- handling_trycatch(
+            read_variabletypes(set,
+            main$raw$value, odbc$value$odbc_source))
+    } else {
+        main$with_types <- handling_trycatch(
+            read_variabletypes(set,
+            main$raw$value, NULL))
+    }
+    print("Variable types defined.", quote = F)
+    print_time(start)
+    return(main)
 }

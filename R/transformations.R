@@ -1,19 +1,19 @@
 # BILOT AI-jack H2O-module, transformations
 # (c) Bilot Oy 2020
-# Any user is free to modify this software for their 
+# Any user is free to modify this software for their
 # own needs, bearing in mind that it comes with no warranty.
 
 #' Create data partitioning key
-#' 
+#'
 #' @param main main data object
 #' @param set config object
 #'
 #' @return main data object with data split column added
 #'
-#' @description 
-#' If the label is categorical, a stratified data split 
-#' (based on the label variable) is created using 
-#' the createDataPartition function in the caret-package, 
+#' @description
+#' If the label is categorical, a stratified data split
+#' (based on the label variable) is created using
+#' the createDataPartition function in the caret-package,
 #' based on split proportions defined in configuration. Othervise,
 #' a random split is made. A new column is added to the type-set
 #' data, which is returned.
@@ -23,12 +23,12 @@
 create_split <- function(main,set){
   X <- main$with_types$value$Data_with_types
   y <- X[[set$main$label]]
-  
+
   # Calculate proportions:
   p_tr <- set$split_data$prop_train
   p_ts <- set$split_data$prop_test/(1-p_tr)
   splits <- numeric(nrow(X))
-  
+
   # Get indices:
   if (set$main$labeliscategory){
     i_tr <- caret::createDataPartition(
@@ -36,26 +36,26 @@ create_split <- function(main,set){
     i_ts <- caret::createDataPartition(
       y[-i_tr],
       p <- p_ts)$Resample1
-  
+
     # Define splits:
     splits[i_tr] <- 1
     splits[-i_tr][i_ts] <- 2
-    splits[splits==0] <- 3  
+    splits[splits==0] <- 3
   } else {
     vals <- runif(nrow(X))
     i_tr <- which(vals < set$split_data$prop_train)
-    i_ts <- which(vals > set$split_data$prop_train & 
+    i_ts <- which(vals > set$split_data$prop_train &
                   vals < (set$split_data$prop_train + set$split_data$prop_test))
     # Define splits:
     splits[i_tr] <- 1
     splits[i_ts] <- 2
     splits[splits==0] <- 3
   }
-  
+
   # Add to data:
   main$with_types$value$Data_with_types$test_train_val <- as.character(splits)
   main$with_types$value$Variable_types <- rbind(main$with_types$value$Variable_types,c('test_train_val','char'))
-  
+
   return(main)
 }
 
@@ -67,7 +67,7 @@ create_split <- function(main,set){
 #' @return main object with transformed data.
 #'
 #' @description
-#' This module is used, when there is too much NA's in
+#' This function is used, when there is too much NA's in
 #' continuous variables and you can't impute them.
 #' This replaces negative values with \code{'Under0'}, zeros with \code{'0'},
 #' positive values with \code{'Over0'} and NA's with \code{'Missing'} and
@@ -196,8 +196,10 @@ trans_replaceScandAndSpecial <- function(df, set){
 #' @param set config object
 #'
 #' @return
-#' Discretisize variables. If not possible returns NULL.
-#' Otherwise returns list of discretized data, new variables and cut-points
+#' Returns a list of discretized data,
+#' new variables and their cut-points.
+#' If it is not possible to descretize,
+#' returns NULL.
 #'
 #' @export
 
@@ -318,15 +320,16 @@ entropy_recategorization = function(main, set, prep) {
       factor_levels_disc <- lev[!(lev %in% factor_levels)]
 
       # Save cutpoints:
-      path = paste(set$main$project_path, "output_model/",
-                   sep = "/")
+      path = paste(set$main$project_path, "output_model",set$main$path_sep,
+                   sep = set$main$path_sep)
       saveRDS(main$recategorized$value$cutpoints,
-              file = paste0(path, "discretization/",
+              file = paste0(path, "discretization",set$main$path_sep,
                             prep$runid, "_", set$main$model_name_part,
                             "_", set$main$label, "_", "cutpoints.rds"))
       # Save factor_levels_disc:
       saveRDS(factor_levels_disc, file = paste0(path,
-                                                "discretization/", prep$runid, "_", set$main$model_name_part,
+                                                "discretization",set$main$path_sep, prep$runid, "_", 
+                                                set$main$model_name_part,
                                                 "_", set$main$label, "_", "factor_levels_disc.rds"))
 
     } else {
@@ -358,15 +361,15 @@ entropy_recategorization = function(main, set, prep) {
 #'                             "delete_constant"))
 #'
 #' @description
-#' allowed transformations \code{c("delete_equal", "clean_special", 
-#' "classify_NA", "delete_constant")}. In addition, a column 
+#' allowed transformations \code{c("delete_equal", "clean_special",
+#' "classify_NA", "delete_constant")}. In addition, a column
 #' defining a data split will also be added, if missing from
 #' the data.
 #'
 #' @export
 
-do_transforms = function(main, set, prep, 
-selection = c("delete_equal", "clean_special", 
+do_transforms = function(main, set, prep,
+selection = c("delete_equal", "clean_special",
               "classify_NA", "delete_constant")) {
 
   start <- Sys.time()
@@ -412,6 +415,7 @@ selection = c("delete_equal", "clean_special",
       X = main$special_replaced$value
     } else {
       if ("delete_equal" %in% selection) {
+        X = main$equal_deleted$value$Data_del_equal
       } else {
         X = main$with_types$value$Data_with_types
       }
@@ -434,6 +438,7 @@ selection = c("delete_equal", "clean_special",
         X = main$special_replaced$value
       } else {
         if ("delete_equal" %in% selection) {
+          X = main$equal_deleted$value$Data_del_equal
         } else {
           X = main$with_types$value$Data_with_types
         }

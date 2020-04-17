@@ -14,8 +14,10 @@ trans_entropy(df1, df2, set)
 \item{set}{config object}
 }
 \value{
-Discretisize variables. If not possible returns NULL.
-Otherwise returns list of discretized data, new variables and cut-points
+Returns a list of discretized data,
+new variables and their cut-points.
+If it is not possible to descretize,
+returns NULL.
 }
 \description{
 Discretisize continuous variables by entropy

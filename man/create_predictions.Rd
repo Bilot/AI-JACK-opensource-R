@@ -26,6 +26,10 @@ create_predictions(
 \item{odbc}{ODBC connection config}
 
 \item{odbc_pred}{ODBC connection config for model application}
+
+\item{useMOJO}{whether to use MOJO-models or H2O-formated
+models (default = TRUE. At present, storing H2O-models is
+disabled in the \code{export_model_output} function).}
 }
 \value{
 model predictions

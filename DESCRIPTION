@@ -4,11 +4,12 @@ Title: Package for Machine Learning project handling
 Version: 1.0.0
 Author: as.person(c(
     "Lasse Ruokolainen <lasse.ruokolainen@bilot.fi> [aut, cre]",
-    "Lasse Liukkonen <lasse.liukkonen@bilot.fi> [ctb]"
+    "Lasse Liukkonen <lasse.liukkonen@bilot.fi> [ctb]",
+    "Jedrzej Furmann <jedrzej.furmann@bilot.fi> [ctb]"
   ))
 Maintainer: The package maintainer <lasse.ruokolainen@bilot.fi>
 Description: This package provides a Machine Learning framework for accelating both model development and application.
-License:  MIT + file LICENSE
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
@@ -30,6 +31,6 @@ Imports:
     caret,
     plumber
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests:
     testthat

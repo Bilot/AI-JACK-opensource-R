@@ -24,7 +24,7 @@ do_transforms(
 main data object with transformed data.
 }
 \description{
-allowed transformations \code{c("delete_equal", "clean_special", 
+allowed transformations \code{c("delete_equal", "clean_special",
 "classify_NA", "delete_constant")}. In addition, a column
 defining a data split will also be added, if missing from
 the data.

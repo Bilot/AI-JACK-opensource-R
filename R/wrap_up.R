@@ -50,7 +50,7 @@ clear_model_results = function(result_path){
   # Loop through tables:
   tables = setdiff(dir(path),'README.txt')
   for(ii in tables){
-    nam = paste0(path,'/',ii)
+    nam = paste0(path,set$main$path_sep,ii)
     x = read.csv2(nam,nrow = 1)
     write.table(x[-1,],file = nam,row.names = FALSE,
                 col.names = TRUE, sep = ';')
@@ -83,7 +83,7 @@ collect_results = function(result_path,executionid,
   results = lapply(nam,function(x){
     df <- suppressWarnings(
     suppressMessages(
-    readr::read_csv2(paste0(result_path,'/',x),col_types = cols())
+    readr::read_csv2(paste0(result_path,set$main$path_sep,x),col_types = cols())
     )
     )
     return(df[df$executionid %in% eid,])
@@ -104,7 +104,9 @@ collect_results = function(result_path,executionid,
 
 save_data = function(df,set,prep,get_datetime){
 
-  loc <- paste(set$main$project_path,'/output_model',"/data_objects/",
+  loc <- paste(set$main$project_path,set$main$path_sep,
+              'output_model',set$main$path_sep,"data_objects",
+               set$main$path_sep,
                prep$runid, "_",
                set$main$model_name_part,'_',
                set$main$label, "_data_",
@@ -127,7 +129,7 @@ clear_model_results = function(result_path){
   #if(!('result' %in% dir())) stop('result-folder not in path')
 
   if(!grepl('results',result_path)){
-    path = paste0(result_path,'/results')
+    path = paste0(result_path,set$main$path_sep,'results')
   }else{
     path = result_path
   }
@@ -135,7 +137,7 @@ clear_model_results = function(result_path){
   # Loop through tables:
   tables = setdiff(dir(path),'README.txt')
   for(ii in tables){
-    nam = paste0(path,'/',ii)
+    nam = paste0(path,set$main$path_sep,ii)
     x = read.csv2(nam,nrow = 1)
     write.table(x[-1,],file = nam,row.names = FALSE,
                 col.names = TRUE, sep = ';')

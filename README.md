@@ -50,6 +50,8 @@ the following command to the system terminal:
 java -version
 ```
 
+If there is no Java installation on your machine, this command should prompt installation. If you have an old version, you probably neet to update it. Java installations can be found <a href="https://www.oracle.com/java/technologies/javase-downloads.html">here</a>.
+
 <p style='text-align: justify;'>
 To install the <b>AI-jack</b> package, all you need is to run the following command in <b>R</b> (making sure that the `devtools` package has been installed): 
 </p>
@@ -106,10 +108,31 @@ When the parameterisation has been done approprietly, the modeling workflow can 
 One also needs to make sure that the control <code>.R</code>-files are located in the <code>control</code>-folder in the project directory and that the working directory is set to the project directory (this can be set automatically in the workflow, given that the correct path is specified in the settings). 
 </p>
 
-To execute a workflow from command line, simply run the following command in your project path: 
+### Running
+
+After the necessary configurations have been made, a workflow can be executed from command line as follows. First, make sure that you're located in the project directory (`cd /path/to/project`). Then simply run the following command in your project path: 
+
+**Mac/Linux**
+```r
+Rscript control/main_model.R 
+```
+
+Again, given that the `config_model.R` has been modified correctly, this should run the model training workflow.
+
+**Windows**
+If you're running Windows, you may need to tell where the `Rscript` program is located:
+
+**From R**
+To run the workflow from withion `R`, first set the working directory to the project path:
 
 ```r
-Rscript main_model.R 
+setwd('/path/to/project')
+```
+
+Then, just source the workflow script:
+
+```r
+source('control/main_model.R')
 ```
 
 ### Data
@@ -155,8 +178,18 @@ The Boston house price data, consisting of ca. 500 rows of indicators of median 
 </p>
 
 <p style='text-align: justify;'>
-Foe each of the datasets, there is also a data types-file available, as well as an unlabelled samples for testing model application.
+For each of the datasets, there is also a data types-file available, as well as an unlabelled samples for testing model application.
 </p>
+
+<br>
+
+## *Modelling*
+
+The modelling functionality of **AI-jack** rests upon package [`h2o`](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/welcome.html), enabling running H2O from within R. H2O is an open source, in-memory, distributed, fast, and scalable machine learning and predictive analytics platform that allows you to build machine learning models on big data and provides easy productionalization of those models in an enterprise environment.
+
+At present, <b>AI-jack</b> has capabilities for training either classification or regression models. For classification, the logic has been built binary problems in mind, but this can be fairly easily modified. 
+
+<br>
 
 ## *Web service*
 
@@ -211,4 +244,54 @@ curl --data "param=val1#val2#val3#val4&param2=nam1#nam2#nam3#nam4&param3=f#n#n#f
 
 <p style='text-align: justify;'>
 The result will be written either to a results table ("output_plumber/predictions.csv") or to SQL database table, depending on the settings.
+</p>
+
+<br>
+
+## *Technical details*
+
+### Data
+<p style='text-align: justify;'>
+The <code>data_read()</code> function handles the retrieval of raw data from the specified source. When writing output, either <code>write_db()</code> or <code>write_csv()</code> will be used, depending on the data connection. 
+</p>
+
+### Statistics
+<p style='text-align: justify;'>
+In the workflow, the <code>prep_results()</code> function (among other operations) generates a standard statistical summary of the data, which will be outputted to a <code>metadata</code> table. In turn, the <code>calculate_stats()</code> function calculates other statistics on the data (only correlation implememted).
+</p>
+
+### Transformations
+<p style='text-align: justify;'>
+The following transformation routines are available:
+</p>
+
+- Classify numeric features with missing values (`trans_classifyNa`)  
+- Drop constant features (`trans_delconstant`)  
+- Drop equal (redundant) features (`trans_delequal`)  
+- Replace special characters in nominal features and feature names (`trans_replaceScandAndSpecial`)  
+- Discretise continuous features, based on entropy (`trans_entropy`)
+
+<p style='text-align: justify;'>
+The transformation step is handled by the <code>do_transforms()</code> function, except for <code>trans_entropy</code>, which is call by the <code>entropy_recategorization()</code> function. Recategorised data will be constructed and used in models, if the parameter <code>set$model$discretize</code> is set <code>TRUE</code>. Also, function <code>create_split()</code> will be called in the workflow, if the raw data does not contain a column specifying data split. 
+</p>
+
+### Model algorithms
+<p style='text-align: justify;'>
+Currently, the following supervised modelling methods are available:
+</p>
+
+- linear models (`glm`) with `h2o.glm`  
+- decision tree (`decdecisionTree`) with `h2o.randomForest` (`n_trees = 1`)  
+- random forest (`randomForest`) with `h2o.randomForest`  
+- gradient boosting (`gbm`) with `h2o.gbm`  
+- extreme gradient boosting (`xgboost`) with `h2o.xgboost`  
+- deep learning (`deeplearning`) with `h2o.deeplearning`  
+- autoML (`automl`) with `h2o.automl`  
+
+<p style='text-align: justify;'>
+In addition, deep learning is also possible to run in unsupervised form, by using it in <code>autoencoder</code> form.
+</p>
+
+<p style='text-align: justify;'>
+The <code>create_models()</code> function handles hyperparameter optimisation (training with <code>train</code>-split and validating with <code>test</code>-split) as well as re-fitting the best model (on both the <code>train</code>- and <code>test</code>-split, except for deep learning).
 </p>

@@ -152,6 +152,9 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
   }
 
   nam <- names(models)
+  
+  # update test:
+  test <- test | grepl('isoForest',names(models),ignore.case = T)
   varimp <- foreach(ii = nam[!test], .combine = rbind)%do%{
     x = models[[ii]]
     data.frame(executionid = runid,
@@ -162,7 +165,10 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
   }
 
   # (3) Predict for valid-set: ----
-  pred_val <- foreach(ii = names(models), .combine = rbind)%do%{
+  # (3.1) Other than anomaly detection: ----
+  anomaly <- grep('isoForest',names(models),value = T)
+  nam <- setdiff(names(models),anomaly)
+  pred_val <- foreach(ii = nam, .combine = rbind)%do%{
     x = models[[ii]]
     preds = h2o.predict(x, newdata = h2o_data$val)
     data.frame(
@@ -173,12 +179,31 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
       pred = as.vector(preds$predict),
       proba = round(as.vector(ifelse(is.factor(h2o_data$val[,label]),
                                      preds[,3],NA)),3),
-      row.names = NULL
+      row.names = NULL,
+      stringsAsFactors = F
     )
   }
+  
+  # (3.2) Anomaly detection: ----
+  vals <- foreach(ii = anomaly, .combine = rbind)%do%{
+    x = models[[ii]]
+    preds = h2o.predict(x, newdata = h2o_data$val)
+    data.frame(
+      executionid = as.numeric(runid),
+      model_name = ids[ii],
+      row_identifier = as.vector(h2o_data$val[, set$main$id]),
+      obs = NA,
+      pred = as.vector(preds$mean_length),
+      proba = as.vector(preds$predict),
+      row.names = NULL,
+      stringsAsFactors = F
+    )
+  }
+  pred_val <- rbind(pred_val,vals)
 
   # (4) Calculate model fitting/accuracy measures: ----
-  perf <- foreach(ii = names(models),.combine = rbind) %do% {
+  # (4.1) Other than anomaly detection: ----
+  perf <- foreach(ii = nam,.combine = rbind) %do% {
     sets = c('train','test','val')
     perf <- lapply(sets, function(x){
       perf = tryCatch(
@@ -193,12 +218,18 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
     names(perf) <- paste0('value_',sets)
     return(perf)
   }
+  
+  # (4.2) Anomaly detection: ----
+  sets = c('train','test','val')
+  tmp <- perf[1:length(anomaly),]
+  tmp[1:length(anomaly),] <- NA
+  perf <- rbind(perf,tmp)
 
   model_fit_measures <- data.frame(
     executionid = as.numeric(runid),
     time = time,
     label = label,
-    model_name = model_names,
+    model_name = names(models),
     metric = metric,
     perf,
     notions = '',
@@ -261,11 +292,11 @@ export_model_output <- function(models, output, set, prep, odbc){
     # (2.1) Export performance: ----
     write_csv(set, output$model_fit_measures,
               paste(set$csv$result$prefix,
-                    set$csv$result$acc,sep='/'), append = T)
+                    set$csv$result$acc,sep=set$main$path_sep), append = T)
     # (2.2) Export application table: ----
     write_csv(set, output$apply_model,
               paste(set$csv$result$prefix,
-                    set$csv$result$model,sep='/'), append = T)
+                    set$csv$result$model,sep=set$main$path_sep), append = T)
     # (2.3) Export predictions: ----
     # choose target table based on label type
     #target <- ifelse(set$main$labeliscategory,
@@ -282,14 +313,14 @@ export_model_output <- function(models, output, set, prep, odbc){
     #}
     write_csv(set, output$predictions,
               paste(set$csv$result$prefix,
-                    set$csv$result$val,sep='/'),
+                    set$csv$result$val,sep=set$main$path_sep),
               append = set$main$append_predicts,
               colnames = c('executionid','model_name',"row_identifier",'obs','pred','proba'))
     # (2.4) Export regression coefficients: ----
     if(length(output$coefficients) > 0){
       write_csv(set, output$coefficients,
                 paste(set$csv$result$prefix,
-                      set$csv$result$coef, sep='/'),
+                      set$csv$result$coef, sep=set$main$path_sep),
                 append = TRUE)
       #,colnames = c('executionid','label','model_name',"variable",'coef'))
     }
@@ -297,28 +328,30 @@ export_model_output <- function(models, output, set, prep, odbc){
     if(length(output$feature_importance) > 0){
       write_csv(set, output$feature_importance,
                 paste(set$csv$result$prefix,
-                      set$csv$result$imp,sep='/'),
+                      set$csv$result$imp,sep=set$main$path_sep),
                 append = TRUE)
     }
   }
 
   # (3) Save factor levels: ----
-  loc <- paste0(set$main$project_path,"/output_model/factor_levels/",
+  loc <- paste0(set$main$project_path,set$main$path_sep,"output_model",
+                set$main$path_sep,"factor_levels",set$main$path_sep,
                 paste(prep$runid,set$main$model_name_part,set$main$label,
                       'factorLevels.rds',sep='_'))
   saveRDS(output$factor_levels, file = loc)
 
   # (4) Save model parameters: ----
-  loc <- paste0(set$main$project_path,"/output_model/parameters/",
+  loc <- paste0(set$main$project_path,set$main$path_sep,"output_model",
+                set$main$path_sep,"parameters",set$main$path_sep,
                 paste(prep$runid,set$main$model_name_part,set$main$label,
                       'parameters.rds',sep='_'))
   saveRDS(output$parameters, file = loc)
 
   # (5) Save models to MOJO: ----
-  path = paste(set$main$project_path,set$main$model_path,sep="/")
+  path = paste(set$main$project_path,set$main$model_path,sep=set$main$path_sep)
   for(ii in names(models)){
-    test <- file.exists(paste0(set$main$model_path,
-                               '/h2o-genmodel.jar'))
+    test <- file.exists(paste0(set$main$model_path,set$main$path_sep,
+                               'h2o-genmodel.jar'))
     gwt_jar <- ifelse(test,FALSE,TRUE)
 
     h2o.download_mojo(model = models[[ii]],

@@ -15,7 +15,7 @@
 #' @export
 
 list_models = function(model_path){
-  sep = ifelse(grepl('/$',model_path),'','/')
+  sep = ifelse(grepl('/$',model_path),"","/")
   print(
     read.csv2(paste0(model_path,sep,'models.csv'))
   )
@@ -29,6 +29,9 @@ list_models = function(model_path){
 #' @param apply_models row specifying applied model
 #' @param odbc ODBC connection config
 #' @param odbc_pred ODBC connection config for model application
+#' @param useMOJO whether to use MOJO-models or H2O-formated 
+#' models (default = TRUE. At present, storing H2O-models is 
+#' disabled in the \code{export_model_output} function).
 #'
 #' @return model predictions
 #'
@@ -52,10 +55,11 @@ create_predictions <- function(df, set, prep,
                         function(x) grepl(x,apply_models$model_name,
                                           ignore.case = T)))
 
-
   # (2) FACTOR LEVELS: ----
   # (2.1) Get levels ----
-  path = paste0(set$main$project_path,'/output_model/factor_levels/')
+  path = paste0(set$main$project_path,set$main$path_sep,
+                'output_model',set$main$path_sep,'factor_levels',
+                set$main$path_sep)
   factor_levels <- readRDS(paste0(path,
                                   runid,'_',
                                   set$main$model_name_part,'_',
@@ -82,7 +86,8 @@ create_predictions <- function(df, set, prep,
 
     # (3.1) Get cutpoints ----
     path <- paste0(set$main$project_path,
-                   'output_model/discretization/',
+                   'output_model',set$main$path_sep,'discretization',
+                   set$main$path_sep,
                    runid,'_',
                    set$main$model_name_part,'_',
                    label)
@@ -104,26 +109,27 @@ create_predictions <- function(df, set, prep,
 
   # (4) MAKE PREDICTIONS: ----
   if(useMOJO){
-    path = paste(set$main$project_path,set$main$model_path,sep='/')
+    path = paste(set$main$project_path,
+                 set$main$model_path,
+                 sep=set$main$path_sep)
     names <- grep('.zip',dir(path),value = T)
     use <- grep(apply_models$model_name,names,value = T)
     if(length(use)==0){
-      get_package('stringdist')
       use = names(
         which.max(
           sapply(names,function(x){
-            stringdist(apply_models$model_name,x)
+            stringdist::stringdist(apply_models$model_name,x)
           })
         )
       )
     }
-    path <- paste0(set$main$project_path,'/',
-                   set$main$model_path,'/',use)
+    path <- paste0(set$main$project_path,set$main$path_sep,
+                   set$main$model_path,set$main$path_sep,use)
     preds <- h2o.mojo_predict_df(df,mojo_zip_path = path)
   }else{
     start_h2o(set = set)
 
-    path <- paste0(set$main$model_path,'/', apply_models$model_name)
+    path <- paste0(set$main$model_path,set$main$path_sep, apply_models$model_name)
     model_temp <- h2o.loadModel(path)
     mod_feat = attr(model_temp,'model')$names
 
@@ -167,11 +173,11 @@ create_predictions <- function(df, set, prep,
   }else{
     write_csv(set, pred_temp,
               paste(set$csv$result$prefix,
-                    set$csv$result$pred,sep='/'),
+                    set$csv$result$pred,sep=set$main$path_sep),
               append = T)
     write_csv(set, model_exec_ma,
               paste(set$csv$result$prefix,
-                    set$csv$result$exec_model,sep='/'),
+                    set$csv$result$exec_model,sep=set$main$path_sep),
               append = T)
   }
 }
@@ -206,8 +212,8 @@ make_predictions = function(set,main,prep,odbc){
     create_predictions(df, set, prep$runid, prep$runid_row,
                        odbc$value$odbc_metadata, odbc$value$odbc_pred)
   } else {
-    path = paste0(set$main$project_path,'/',
-                  set$main$model_model_path,'/',
+    path = paste0(set$main$project_path,set$main$path_sep,
+                  set$main$model_model_path,set$main$path_sep,
                   set$csv$result$model, ".csv")
     apply_models <- read.csv2(path)
     apply_models$apply[set$main$model_row] = 1

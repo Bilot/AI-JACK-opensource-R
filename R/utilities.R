@@ -754,7 +754,6 @@ cat(
 library(AIjack)
 print_message("AI-jack: starting new session...")
 rm(list=ls())
-library(AIjack)
 
 # (2) Get datetime for logs and model names ----
 get_datetime <- format(Sys.time(),"%Y_%m_%d_%H_%M")

@@ -106,6 +106,7 @@ fix_metric <- function(set){
 #' Function for generating model outputs
 #'
 #' @param models either a single model object or a list of models
+#' @param model_names a vector of model IDs
 #' @param set config object
 #' @param runid run ID
 #' @param h2o_data a list of H2OFrames
@@ -127,7 +128,7 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
   # (1) Get parameters: ----
   label <- set$main$label
   metric <- fix_metric(set)
-  ids <- sapply(model_names,c)
+  ids <- model_names
   names(ids) <- names(models)
 
   time = format(Sys.time(), "%d-%m-%Y %H:%M:%S")
@@ -165,12 +166,13 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
   }
 
   # (3) Predict for valid-set: ----
+  val_frame <- as.h2o(main$splitted$value$val)
   # (3.1) Other than anomaly detection: ----
   anomaly <- grep('isoForest',names(models),value = T)
   nam <- setdiff(names(models),anomaly)
   pred_val <- foreach(ii = nam, .combine = rbind)%do%{
     x = models[[ii]]
-    preds = h2o.predict(x, newdata = h2o_data$val)
+    preds = h2o.predict(x, newdata = val_frame)
     data.frame(
       executionid = as.numeric(runid),
       model_name = ids[ii],
@@ -185,21 +187,23 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
   }
   
   # (3.2) Anomaly detection: ----
-  vals <- foreach(ii = anomaly, .combine = rbind)%do%{
-    x = models[[ii]]
-    preds = h2o.predict(x, newdata = h2o_data$val)
-    data.frame(
-      executionid = as.numeric(runid),
-      model_name = ids[ii],
-      row_identifier = as.vector(h2o_data$val[, set$main$id]),
-      obs = NA,
-      pred = as.vector(preds$mean_length),
-      proba = as.vector(preds$predict),
-      row.names = NULL,
-      stringsAsFactors = F
-    )
+  if(!is.character0(anomaly)){
+    vals <- foreach(ii = anomaly, .combine = rbind)%do%{
+      x = models[[ii]]
+      preds = h2o.predict(x, newdata = h2o_data$val)
+      data.frame(
+        executionid = as.numeric(runid),
+        model_name = ids[ii],
+        row_identifier = as.vector(h2o_data$val[, set$main$id]),
+        obs = NA,
+        pred = as.vector(preds$mean_length),
+        proba = as.vector(preds$predict),
+        row.names = NULL,
+        stringsAsFactors = F
+      )
+    }
+    pred_val <- rbind(pred_val,vals)
   }
-  pred_val <- rbind(pred_val,vals)
 
   # (4) Calculate model fitting/accuracy measures: ----
   # (4.1) Other than anomaly detection: ----
@@ -220,10 +224,12 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
   }
   
   # (4.2) Anomaly detection: ----
-  sets = c('train','test','val')
-  tmp <- perf[1:length(anomaly),]
-  tmp[1:length(anomaly),] <- NA
-  perf <- rbind(perf,tmp)
+  if(!is.character0(anomaly)){
+    sets = c('train','test','val')
+    tmp <- perf[1:length(anomaly),]
+    tmp[1:length(anomaly),] <- NA
+    perf <- rbind(perf,tmp)
+  }
 
   model_fit_measures <- data.frame(
     executionid = as.numeric(runid),

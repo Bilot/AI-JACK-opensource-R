@@ -655,7 +655,8 @@ set$odbc$result = list(
   metad = "metadata",
   war = "warning_error",
   model = "models",
-  imp = "column_importance"
+  imp = "column_importance",
+  val = "clusters"
 )
 
 #Source queries
@@ -720,6 +721,7 @@ set$csv$result <- list(
   war = "warning_error",
   model = "models",
   imp = "column_importance",
+  val = "clusters",
   sep=";"
 )
 
@@ -1064,6 +1066,7 @@ print_message("Starting modelling...")
 data = cluster_dataprep(main$splitted$value$train,set = set)
 opt = optimize_clustering(data,set)
 output = get_cluster_output(set, runid, data)
+export_clust_output(output, set, prep, odbc)
 
 print_message("Exiting...")
 

@@ -1068,7 +1068,7 @@ output = get_cluster_output(set, runid, data)
 print_message("Exiting...")
 
 # (12) Write execution rows ----
-write_cluster_exec(set = set,prep = prep,odbc = odbc)
+write_exec(set = set,prep = prep,odbc = odbc)
 
 # (13) Save data object ----
 save_data(main,set,prep,get_datetime)

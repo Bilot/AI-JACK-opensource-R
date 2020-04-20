@@ -549,7 +549,185 @@ print("Settings created.", quote = F)
 
 ')
 sink()
+# Create config_clust_model.R: ----
+  sink(
+    file=paste0(directories$control,"/config_clust_model.R")
+  )
+  cat(
+    '
 
+# CONFIG_MODEL
+#
+# This config-file is used to
+# parameterize AI-jack modules
+# when performing clustering model training.
+#
+# (c) Bilot Oy 2020
+# Any user is free to modify this software for their own needs,
+# bearing in mind that it comes with no warranty.
+
+# (1) MAIN SETTINGS: ----
+set <- list()
+project_path <- "<PROJECT_PATH>"
+
+# (1.1) Input/Output: ----
+set$main <- list(
+  project_path = project_path,
+  
+  # DATA:
+  use_db = FALSE,
+  model_name_part = "<NAME>",
+  id = "id",
+  test_train_val = "test_train_val",
+  path_sep = "/",
+  
+  # OUTPUT
+  append_predicts = FALSE
+)
+
+# (1.3) Output: ----
+set$main$model_path <- paste("output_model","models",sep=set$main$path_sep)
+set$main$result_path <- paste("output_model","result",sep=set$main$path_sep)
+
+# (1.3) Technical: ----
+set$main$write_to_log <- FALSE # write logs to file?
+set$main$log_path <- "logs"
+set$main$num_cores <- parallel::detectCores()-1
+set$main$seed <- 1234
+set$main$min_mem_size <- "5g"
+set$main$max_mem_size <- "7g"
+
+# (2) FILE CONNECTION PARAMETERS: ----
+# (2.1) Files: ----
+files <- dir(paste(set$main$project_path,"source_model",sep=set$main$path_sep))
+set$main$data_path <- paste("source_model",grep("csv",files,value = T),sep=set$main$path_sep)
+if(any(grepl("type",set$main$data_path))){
+    set$main$data_path <- set$main$data_path[-grep("type",set$main$data_path,ignore.case = T)]
+}
+set$main$type_path <- paste("source_model",grep("types",files,value = T),sep=set$main$path_sep)
+set$main$file_sep <- ";"
+set$main$file_dec <- "."
+set$main$file_fread <- FALSE
+set$main$file_fwrite <- FALSE
+
+# (2.2) Variable types: ----
+set$read_variable_types	<-	list(
+  # CSV-source column types (path)
+  file_path	=	paste(set$main$project_path,
+                    set$main$type_path,sep=set$main$path_sep),
+  # Database specific column names (SQL SERVER)
+  name_column =	"COLUMN_NAME",
+  type_column =	"TYPE_NAME",
+  # Read column types from db?
+  types_from_database	=	set$main$use_db
+)
+
+# (3) ODBC CONNECTION PARAMETERS: ----
+set$odbc = list(
+  # Source server name
+  server_r = "localhost",
+  # Source database name
+  database_r = "modellingsource",
+  # Source table/view name
+  table_r = "",
+  # Source user name
+  user_r = "",
+  # Source user password
+  user_pw_r = "",
+  
+  # Result server name (models)
+  server_m = "localhost",
+  database_m = "modellingmetadata",
+  server_p = "localhost",
+  database_p = "modellingprediction",
+  server_v = "localhost",
+  database_v = "modellingvalidation"
+)
+
+set$odbc$con_string <- "Driver={SQL Server Native Client 11.0};server=XXXXXXX;database=modellingvalidation-dev;Uid=XXXXXXX;Pwd=XXXXXXX;Encrypt=yes"
+
+set$odbc$result = list(
+  #  prefix = set$main$result_path,
+  exec = "execution",
+  coef = "coefficient",
+  acc = "accuracy",
+  cols = "columns",
+  metad = "metadata",
+  war = "warning_error",
+  model = "models",
+  imp = "column_importance"
+)
+
+#Source queries
+set$odbc$query_r <- paste("SELECT * FROM",
+                          set$odbc$table_r, sep=" ")
+
+# (4) DATA PREP PARAMETERS: ----
+set$trans_entropy <- list(
+  jitter_factor = 0.0001,
+  skip_na = FALSE
+)
+set$stat_correlation	<-	list(
+  #Correlation pairs
+  filter_type	=	"pairwise.complete.obs"
+)
+set$trans_classifyNa	<-	list(
+  limit	=	10
+)
+set$split_data <- list(
+  # Set parameters such that their
+  # sum is < 1; rest of the data
+  # goes to validation
+  prop_train = 0.7,
+  prop_test = 0.2
+)
+set$model = list()
+
+set$cluster = list(
+  cols_not_included = c("churn", set$main$id,
+                        set$main$test_train_val),
+  n_max = 500,
+  col_types_used = 'all', # 'numeric', 'categorical', or 'all'
+  use_gower = TRUE,
+  cluster_range = c(2,7),
+  n_jobs = 4,
+  max_iter = 100
+)
+
+# (6) CSV Connection Parameters: ----
+# (6.1) Configure data read: ----
+set$read_csv 	<-	list(
+  # CSV-source path and file name
+  file_path	=	set$main$data_path,
+  # File separator
+  file_sep	=	set$main$file_sep,
+  # NA-coding in source
+  file_na		=	c("NA", "", "NULL"),
+  # Read with using fread-function?
+  file_fread	=	set$main$file_fread,
+  # File decimal separator
+  file_dec	=	set$main$file_dec
+)
+# (6.2) Configure result output: ----
+set$csv$result <- list(
+  prefix = paste(set$main$project_path,"output_model","results",sep=set$main$path_sep),
+  exec = "execution",
+  coef = "coefficients",
+  acc = "accuracy",
+  cols = "columns",
+  metad = "metadata",
+  war = "warning_error",
+  model = "models",
+  imp = "column_importance",
+  sep=";"
+)
+
+print("Settings created.", quote = F)
+
+
+')
+sink()
+  
 # Create config_apply.R: ----
 sink(
   file=paste0(directories$control,"/config_apply.R")
@@ -817,6 +995,89 @@ clean_up()
 )
 sink()
 
+ # Create main_clust_model.R: ----
+sink(
+  file=paste0(directories$control,"/main_clust_model.R")
+)
+cat(
+  '
+
+# BILOT AI-jack, main-file for MODELLING
+#
+# Can be executed either line-by-line, or called
+# directly from console/terminal, given that
+# necessary configurations have been made.
+#
+# To run within R: source("main_model.R")
+# To run from CL: Rscript main_model.R
+#
+# (c) Bilot Oy 2020
+# Any user is free to modify this software for their own needs,
+# bearing in mind that it comes with no warranty.
+
+# (1) Clear session ----
+library(AIjack)
+print_message("AI-jack: starting new session...")
+rm(list=ls())
+
+# (2) Get datetime for logs and model names ----
+get_datetime <- format(Sys.time(),"%Y_%m_%d_%H_%M")
+
+# (3) Source main settings and functions ----
+source("control/config_model.R")
+
+# (4) Start logging ----
+logging_control(set)
+
+# (5) Source connections ----
+odbc = open_connections(set)
+
+# To make odbc connection to work:
+# SQL Server Configuration manager
+# -> Sql Server Network Configuration
+# -> Protocols for MSSQLSERVER
+# -> Right click to enable TCP/IP
+
+print_message("Starting data prep...")
+# (6) Read source data ----
+main = data_read(set = set, odbc = odbc)
+
+# (7) Prepare results sets ----
+prep = prep_results(set = set,main = main,odbc = odbc)
+
+# (8) Transform source data ----
+main = do_transforms(main = main,set = set,prep = prep)
+
+# (9) Split data into train, test, val ----
+main = split_data(main = main,set = set)
+
+# (10) Calculate statistics ----
+main$stats <- calculate_stats(set = set,
+                              main = main,
+                              methods = "spearman")
+
+
+print_message("Starting modelling...")
+
+# (11) Train model ----
+data = cluster_dataprep(main$splitted$value$train,set = set)
+opt = optimize_clustering(data,set)
+output = get_cluster_output(set, runid, data)
+
+print_message("Exiting...")
+
+# (12) Write execution rows ----
+write_exec(set = set,prep = prep,odbc = odbc)
+
+# (13) Save data object ----
+save_data(main,set,prep,get_datetime)
+
+# (14) Stop logging, print warnings & close connections ----
+clean_up()
+    '
+)
+sink()
+  
 # Create main_apply.R: ----
 sink(
   file=paste0(directories$control,"/main_apply.R")

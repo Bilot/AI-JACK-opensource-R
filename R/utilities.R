@@ -687,7 +687,7 @@ set$cluster = list(
   cols_not_included = c("churn", set$main$id,
                         set$main$test_train_val),
   n_max = 500,
-  col_types_used = 'all', # 'numeric', 'categorical', or 'all'
+  col_types_used = "all", # "numeric", "categorical" or "all"
   use_gower = TRUE,
   cluster_range = c(2,7),
   n_jobs = 4,

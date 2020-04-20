@@ -1003,14 +1003,14 @@ sink(
 cat(
   '
 
-# BILOT AI-jack, main-file for MODELLING
+# BILOT AI-jack, main-file for CLUSTERING MODELLING
 #
 # Can be executed either line-by-line, or called
 # directly from console/terminal, given that
 # necessary configurations have been made.
 #
-# To run within R: source("main_model.R")
-# To run from CL: Rscript main_model.R
+# To run within R: source("main_clust_model.R")
+# To run from CL: Rscript main_clust_model.R
 #
 # (c) Bilot Oy 2020
 # Any user is free to modify this software for their own needs,
@@ -1025,7 +1025,7 @@ rm(list=ls())
 get_datetime <- format(Sys.time(),"%Y_%m_%d_%H_%M")
 
 # (3) Source main settings and functions ----
-source("control/config_model.R")
+source("control/config_clust_model.R")
 
 # (4) Start logging ----
 logging_control(set)

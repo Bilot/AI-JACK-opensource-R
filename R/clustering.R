@@ -198,14 +198,52 @@ write_cluster_exec <- function (set, prep, odbc) {
              set$odbc$result$metad)
     write_db(channel = odbc$value$odbc_metadata, prep$columns, 
              set$odbc$result$cols)
+    write_db(channel = odbc$value$odbc_metadata, output$model_fit_measures, 
+             set$odbc$result$acc)
+    write_db(channel = odbc$value$odbc_metadata, output$apply_model, 
+             set$odbc$result$model)
+    write_db(channel = odbc$value$odbc_validation, output$predictions, 
+             set$odbc$result$val)
+    write_db(channel = odbc$value$odbc_metadata_azuredb, 
+             output$model_fit_measures, set$odbc$result$acc)
+    write_db(channel = odbc$value$odbc_metadata_azuredb, 
+             output$apply_model, set$odbc$result$model)
   }
   if (set$main$use_db == F) {
-    write_csv(set, prep$execution_row, paste(set$csv$result$prefix, 
-                                             set$csv$result$exec, sep = set$main$path_sep), append = T)
-    write_csv(set, prep$summary_table, paste(set$csv$result$prefix, 
-                                             set$csv$result$metad, sep = set$main$path_sep), append = T)
-    write_csv(set, prep$columns %>% select(-label), paste(set$csv$result$prefix, 
-                                       set$csv$result$cols, sep = set$main$path_sep), append = T)
+    write_csv(set, output$model_fit_measures, paste(set$csv$result$prefix, 
+                                                    set$csv$result$acc, sep = set$main$path_sep), append = T)
+    write_csv(set, output$apply_model, paste(set$csv$result$prefix, 
+                                             set$csv$result$model, sep = set$main$path_sep), append = T)
+    write_csv(set, output$predictions, paste(set$csv$result$prefix, 
+                                             set$csv$result$val, sep = set$main$path_sep), append = set$main$append_predicts, 
+              colnames = c("executionid", "model_name", 
+                           "row_identifier", "obs"))
+    if (length(output$coefficients) > 0) {
+      write_csv(set, output$coefficients, paste(set$csv$result$prefix, 
+                                                set$csv$result$coef, sep = set$main$path_sep), 
+                append = TRUE)
+    }
+    if (length(output$feature_importance) > 0) {
+      write_csv(set, output$feature_importance, paste(set$csv$result$prefix, 
+                                                      set$csv$result$imp, sep = set$main$path_sep), 
+                append = TRUE)
+    }
   }
+  loc <- paste0(set$main$project_path, set$main$path_sep, "output_model", 
+                set$main$path_sep, "factor_levels", set$main$path_sep, 
+                paste(prep$runid, set$main$model_name_part, set$main$label, 
+                      "factorLevels.rds", sep = "_"))
+  saveRDS(output$factor_levels, file = loc)
+  loc <- paste0(set$main$project_path, set$main$path_sep, "output_model", 
+                set$main$path_sep, "parameters", set$main$path_sep, 
+                paste(prep$runid, set$main$model_name_part, set$main$label, 
+                      "parameters.rds", sep = "_"))
+  saveRDS(output$parameters, file = loc)
+  write_csv(set, prep$execution_row, paste(set$csv$result$prefix, 
+                                             set$csv$result$exec, sep = set$main$path_sep), append = T)
+  write_csv(set, prep$summary_table, paste(set$csv$result$prefix, 
+                                             set$csv$result$metad, sep = set$main$path_sep), append = T)
+  write_csv(set, prep$columns %>% select(-label), paste(set$csv$result$prefix, 
+                                                          set$csv$result$cols, sep = set$main$path_sep), append = T)
   print("Execution rows written.", quote = F)
 }

@@ -5,7 +5,7 @@ Version: 1.0.0
 Author: as.person(c(
     "Lasse Ruokolainen <lasse.ruokolainen@bilot.fi> [aut, cre]",
     "Lasse Liukkonen <lasse.liukkonen@bilot.fi> [ctb]",
-    "Jedrzej Furmann <jedrzej.furmann@bilot.fi> [ctb]"
+    "Jedrzej Furmann <jedrzej.furmann@bilot.pl> [ctb]"
   ))
 Maintainer: The package maintainer <lasse.ruokolainen@bilot.fi>
 Description: This package provides a Machine Learning framework for accelating both model development and application.

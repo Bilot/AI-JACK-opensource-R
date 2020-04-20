@@ -28,6 +28,7 @@ Imports:
     discretization,
     methods,
     utils,
+    cluster,
     caret,
     plumber,
     factoextra,

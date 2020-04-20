@@ -181,31 +181,3 @@ get_cluster_output <- function(set, runid, data){
     )
   )
 }
-
-#' Function for saving outputs.
-#'
-#' @param set config object
-#' @param prep config object
-#' @param odbc database
-#'
-#' @export
-
-write_cluster_exec <- function (set, prep, odbc) {
-  if (set$main$use_db == T) {
-    write_db(channel = odbc$value$odbc_metadata, prep$execution_row, 
-             set$odbc$result$exec)
-    write_db(channel = odbc$value$odbc_metadata, prep$summary_table, 
-             set$odbc$result$metad)
-    write_db(channel = odbc$value$odbc_metadata, prep$columns, 
-             set$odbc$result$cols)
-  }
-  if (set$main$use_db == F) {
-    write_csv(set, prep$execution_row, paste(set$csv$result$prefix, 
-                                             set$csv$result$exec, sep = set$main$path_sep), append = T)
-    write_csv(set, prep$summary_table, paste(set$csv$result$prefix, 
-                                             set$csv$result$metad, sep = set$main$path_sep), append = T)
-    write_csv(set, prep$columns %>% select(-label), paste(set$csv$result$prefix, 
-                                       set$csv$result$cols, sep = set$main$path_sep), append = T)
-  }
-  print("Execution rows written.", quote = F)
-}

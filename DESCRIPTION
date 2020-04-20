@@ -29,7 +29,13 @@ Imports:
     methods,
     utils,
     caret,
-    plumber
+    plumber,
+    factoextra,
+    mclust,
+    randomForest,
+    ggplot2
+    
+    
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
 Suggests:

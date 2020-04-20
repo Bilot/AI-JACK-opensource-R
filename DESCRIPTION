@@ -3,7 +3,7 @@ Type: Package
 Title: Package for Machine Learning project handling
 Version: 1.0.0
 Author: as.person(c(
-    "Lasse Ruokolainen <lasse.ruokolainen@bilot.fi> [aut, cre]",
+    "Lasse Ruokolainen <laruokol@gmail.com> [aut, cre]",
     "Lasse Liukkonen <lasse.liukkonen@bilot.fi> [ctb]",
     "Jedrzej Furmann <jedrzej.furmann@bilot.fi> [ctb]"
   ))

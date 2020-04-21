@@ -1,21 +1,21 @@
-# AI-jack open source for R
+# AI-JACK open source for R
 
-<img src="https://github.com/Bilot/AI-jack-opensource-R/blob/master/AI-JACK-logo.png"/>
+<img src="https://github.com/Bilot/AI-JACK-opensource-R/blob/master/logo/logo.png"/>
 
 <br>
 
-## *What is AI-jack?*
+## *What is AI-JACK?*
 
 <p style='text-align: justify;'>
-We wanted to do our own AI-projects faster and with fewer errors. Also, coding same things over and over again is quite stupid and boring. We also felt that the maintenance and development of multiple AI/ML-environments needs a coherent solution. We also wanted to create a solution which bends into several different business problems. These factors led us to develop a "framework" that we call <b>AI-jack</b>.
+We wanted to do our own AI-projects faster and with fewer errors. Also, coding same things over and over again is quite stupid and boring. We also felt that the maintenance and development of multiple AI/ML-environments needs a coherent solution. We also wanted to create a solution which bends into several different business problems. These factors led us to develop a "framework" that we call <b>AI-JACK</b>.
 </p>
 
 <p style='text-align: justify;'>
-The <b>AI-jack</b> is basically a collection of code, which facilitates robust development of Machine Learning solutions. It integrates data handling, preprocessing, error handling and logging, model training and versioning, model application, and deployment. All of this is handled with just a few lines of code. The modeling is done using the <a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/index.html">H2O API</a>.
+The <b>AI-JACK</b> is basically a collection of code, which facilitates robust development of Machine Learning solutions. It integrates data handling, preprocessing, error handling and logging, model training and versioning, model application, and deployment. All of this is handled with just a few lines of code. The modeling is done using the <a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/index.html">H2O API</a>.
 </p>
 
 <p style='text-align: justify;'>
-This is the R-version of the <b>AI-jack</b> (we also have a Python version, which is likely to be released later). As we have developped this framework using open source code, we have chosen to provide it back to the community. However, this is not the only reason; we also hope the community could help us develop the framework further and make it even better. 
+This is the R-version of the <b>AI-JACK</b> (we also have a Python version, which is likely to be released later). As we have developped this framework using open source code, we have chosen to provide it back to the community. However, this is not the only reason; we also hope the community could help us develop the framework further and make it even better. 
 </p>
 
 <img src="https://github.com/bilotAIcore/Bilot-AI-core/raw/master/workflow.png"/>
@@ -24,7 +24,7 @@ This is the R-version of the <b>AI-jack</b> (we also have a Python version, whic
 
 ## *Features*
 <p style='text-align: justify;'>
-<b>AI-jack</b> provides capabilities for end-to-end development of machine leartning projects. The functionality is built into <i>modules</i> (collections of functions) that are used to: 
+<b>AI-JACK</b> provides capabilities for end-to-end development of machine leartning projects. The functionality is built into <i>modules</i> (collections of functions) that are used to: 
 </p>
 <ul>
   <li>take care of data connections (e.g., from local files or remote SQL server)</li>
@@ -41,7 +41,7 @@ This is the R-version of the <b>AI-jack</b> (we also have a Python version, whic
 
 ### Installation & setup
 <p style='text-align: justify;'>
-In order to work, <b>AI-jack</b> needs a working installation
+In order to work, <b>AI-JACK</b> needs a working installation
 of Java Runtime Environment. To check whether Java exists, type
 the following command to the system terminal:
 </p>
@@ -53,11 +53,11 @@ java -version
 If there is no Java installation on your machine, this command should prompt installation. If you have an old version, you probably neet to update it. Java installations can be found <a href="https://www.oracle.com/java/technologies/javase-downloads.html">here</a>.
 
 <p style='text-align: justify;'>
-To install the <b>AI-jack</b> package, all you need is to run the following command in <b>R</b> (making sure that the `devtools` package has been installed): 
+To install the <b>AI-JACK</b> package, all you need is to run the following command in <b>R</b> (making sure that the `devtools` package has been installed): 
 </p>
 
 ```r
-devtools::install_github(repo = "Bilot/AI-jack-opensource-R")
+devtools::install_github(repo = "Bilot/AI-JACK-opensource-R")
 ```
 
 Next, one is able to initiate a project as follows:
@@ -80,7 +80,7 @@ The <code>init_aijack</code> function also automatically creates a directory str
 
 ### Handling
 <p style='text-align: justify;'>
-The <code>control</code> folder is intended to contain configuration files that are used for parameterising (<code>config</code> files) <b>AI-jack</b> and handling workflow (<code>main</code> files). For example, the <code>config_model.R</code> file is used to make several specifications regarding data handling, model fitting, and file management. However, to make more detailed adjustments, e.g., to model fitting behaviour, one needs to make changes to the source code.
+The <code>control</code> folder is intended to contain configuration files that are used for parameterising (<code>config</code> files) <b>AI-JACK</b> and handling workflow (<code>main</code> files). For example, the <code>config_model.R</code> file is used to make several specifications regarding data handling, model fitting, and file management. However, to make more detailed adjustments, e.g., to model fitting behaviour, one needs to make changes to the source code.
 </p>
 
 <p style='text-align: justify;'>
@@ -137,11 +137,11 @@ source('control/main_model.R')
 
 ### Data
 <p style='text-align: justify;'>
-The <b>AI-jack</b> is primarily intended to be used for ML-project management in production. This means that while there are some pre-processing steps taking place, there is no functionality for data engineering, which is typically needed <em>before</em> modelling. That is, the intention is that the initial data analysis, investigation and engineering (including feature extraction/engineering) has been done prior to using <b>AI-jack</b>. One clear reason for this is that data engineering is not easily generalised; it depends on the data what manipulations are needed / are most usefull. 
+The <b>AI-JACK</b> is primarily intended to be used for ML-project management in production. This means that while there are some pre-processing steps taking place, there is no functionality for data engineering, which is typically needed <em>before</em> modelling. That is, the intention is that the initial data analysis, investigation and engineering (including feature extraction/engineering) has been done prior to using <b>AI-JACK</b>. One clear reason for this is that data engineering is not easily generalised; it depends on the data what manipulations are needed / are most usefull. 
 </p>
 
 <p style='text-align: justify;'>
-If the <b>AI-jack</b> is run using local files, the <code>source_model</code> directory should contain the source data file in <code>.csv</code> format (by default <code>;</code> separation is assumed). Two columns are also assumed by default: each row needs to have an ID, specified by <code>id</code> column (this can be changed in the settings), and a column <code>test_train_val</code>, which indicates whether a row is assigned to model training, testing, or validation. If these are missing, they will be added automatically (a dummy ID is created and a random data split is added).
+If the <b>AI-JACK</b> is run using local files, the <code>source_model</code> directory should contain the source data file in <code>.csv</code> format (by default <code>;</code> separation is assumed). Two columns are also assumed by default: each row needs to have an ID, specified by <code>id</code> column (this can be changed in the settings), and a column <code>test_train_val</code>, which indicates whether a row is assigned to model training, testing, or validation. If these are missing, they will be added automatically (a dummy ID is created and a random data split is added).
 </p>
 
 <p style='text-align: justify;'>
@@ -185,9 +185,9 @@ For each of the datasets, there is also a data types-file available, as well as 
 
 ## *Modelling*
 
-The modelling functionality of **AI-jack** rests upon package [`h2o`](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/welcome.html), enabling running H2O from within R. H2O is an open source, in-memory, distributed, fast, and scalable machine learning and predictive analytics platform that allows you to build machine learning models on big data and provides easy productionalization of those models in an enterprise environment.
+The modelling functionality of **AI-JACK** rests upon package [`h2o`](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/welcome.html), enabling running H2O from within R. H2O is an open source, in-memory, distributed, fast, and scalable machine learning and predictive analytics platform that allows you to build machine learning models on big data and provides easy productionalization of those models in an enterprise environment.
 
-At present, <b>AI-jack</b> has capabilities for training either classification or regression models. For classification, the logic has been built binary problems in mind, but this can be fairly easily modified. 
+At present, <b>AI-JACK</b> has capabilities for training either classification or regression models. For classification, the logic has been built binary problems in mind, but this can be fairly easily modified. 
 
 <br>
 

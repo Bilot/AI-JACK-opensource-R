@@ -27,12 +27,12 @@ This is the R-version of the <b>AI-JACK</b> (we also have a Python version, whic
 <b>AI-JACK</b> provides capabilities for end-to-end development of machine leartning projects. The functionality is built into <i>modules</i> (collections of functions) that are used to: 
 </p>
 <ul>
-  <li>take care of data connections (e.g., from local files or remote SQL server)</li>
-  <li>retrieve data from source and make prepocessing</li>
-  <li>train (and optimise) user-specified models</li>
-  <li>write execution logs</li>
-  <li>version trained models</li>
-  <li>deployment, e.g., via predictive API service</li> 
+  <li>take care of data connections (e.g., from local files or remote SQL server),</li>
+  <li>retrieve data from source and make prepocessing,</li>
+  <li>train (and optimise) user-specified models,</li>
+  <li>write execution logs,</li>
+  <li>version trained models,</li>
+  <li>deployment, e.g., via predictive API service.</li> 
 </ul>
 
 <br>
@@ -92,13 +92,13 @@ The minimum requirement for adjusting the <code>config_model.R</code>
 file for model training is to:
 </p>
 
-- set the `project_path` variable as the path to the directory used in `init_aijack()` function   
-- in `set$main`, set `label` as the name of the target column in the data  
-- in `set$main`, set `model_name_part`to a name appearing in outputs  
-- in `set$main`, set `id` as the name of an ID-column in the data (a columns with this name will be created, if missing)  
-- in `set$main`, set `test_train_val` as the name of a column indicting to which data split (either 1 = 'train', 2 = 'test', 3 = 'validation') each row belongs to (if missing, a column with this name will be created automatically, containing a data split)  
-- in `set$main`, set `labeliscategory` to either `TRUE`/`FALSE` according to the type of the label column (this is checked in the workflow)  
-- in `set$model`, give a vector in `train_models` to indicate which models should be trained  
+- set the `project_path` variable as the path to the directory used in `init_aijack()` function,   
+- in `set$main`, set `label` as the name of the target column in the data,  
+- in `set$main`, set `model_name_part`to a name appearing in outputs,  
+- in `set$main`, set `id` as the name of an ID-column in the data (a columns with this name will be created, if missing),  
+- in `set$main`, set `test_train_val` as the name of a column indicting to which data split (either 1 = 'train', 2 = 'test', 3 = 'validation') each row belongs to (if missing, a column with this name will be created automatically, containing a data split),  
+- in `set$main`, set `labeliscategory` to either `TRUE`/`FALSE` according to the type of the label column (this is checked in the workflow),  
+- in `set$model`, give a vector in `train_models` to indicate which models should be trained.  
 
 <p style='text-align: justify;'>
 When the parameterisation has been done approprietly, the modeling workflow can be automised by scheduling the execution of the <code>main_model.R</code> script. Similarly, scheduling the execution of the <code>main_apply.R</code> script, it is possible to automate batch application of a specified model on new data. 
@@ -107,6 +107,20 @@ When the parameterisation has been done approprietly, the modeling workflow can 
 <p style='text-align: justify;'>
 One also needs to make sure that the control <code>.R</code>-files are located in the <code>control</code>-folder in the project directory and that the working directory is set to the project directory (this can be set automatically in the workflow, given that the correct path is specified in the settings). 
 </p>
+
+#### Handling and running when using clustering algorithm
+<p style='text-align: justify;'>
+As clustering algorithms are treated slightly differently than supervised ML techniques, there are separate <code>config</code> files designed to work with these methods. There is no need to configure standard <code>config_model.R</code> and <code>main_model.R</code> files - you have to use <code>config_clust_model.R</code> and <code>main_clust_model.R</code> files instead.
+</p>
+
+<p style='text-align: justify;'>
+The adjustment of <code>config_clust_model.R</code> 
+file for model training goes almost the same as <code>config_model.R</code>:
+</p>
+
+- set the `project_path` variable as the path to the directory used in `init_aijack()` function,   
+- in `set$main`, set `model_name_part`to a name appearing in outputs,  
+- in `set$main`, set `id` as the name of an ID-column in the data (a columns with this name will be created, if missing).  
 
 ### Running
 
@@ -197,17 +211,17 @@ At present, <b>AI-JACK</b> has capabilities for training either classification o
 Given that there are trained models to apply, one can easily expose such a model as an API, using <code>plumber</code>. This requires:
 </p>
 
-- a script file `plumber_core.R` that defines the API logic  
-- configuration file `config_plumber.R`  
-- a parameter string for calling the API  
+- a script file `plumber_core.R` that defines the API logic,  
+- configuration file `config_plumber.R`,  
+- a parameter string for calling the API.  
 
 <p style='text-align: justify;'>
 The parameter string consists of three parts:
 </p>
 
-- Feature values: `param <- "param=val1#val2#val3#val4"`  
-- Feature names: `param2 <- "param2=nam1#nam2#nam3#nam4"` 
-- Feature data types: `"param3=f#n#n#f"` (f = factor, n = numeric, etc.)  
+- feature values: `param <- "param=val1#val2#val3#val4"`,  
+- feature names: `param2 <- "param2=nam1#nam2#nam3#nam4"`, 
+- feature data types: `"param3=f#n#n#f"` (f = factor, n = numeric, etc.).  
 
 <p style='text-align: justify;'>
 If the data to query exists in a file, the parameter string can be generasted using the <code>parse_params()</code> function:
@@ -280,16 +294,25 @@ The transformation step is handled by the <code>do_transforms()</code> function,
 Currently, the following supervised modelling methods are available:
 </p>
 
-- linear models (`glm`) with `h2o.glm`  
-- decision tree (`decdecisionTree`) with `h2o.randomForest` (`n_trees = 1`)  
-- random forest (`randomForest`) with `h2o.randomForest`  
-- gradient boosting (`gbm`) with `h2o.gbm`  
-- extreme gradient boosting (`xgboost`) with `h2o.xgboost`  
-- deep learning (`deeplearning`) with `h2o.deeplearning`  
-- autoML (`automl`) with `h2o.automl`  
+- linear models (`glm`) with `h2o.glm`,  
+- decision tree (`decisionTree`) with `h2o.randomForest` (`n_trees = 1`),  
+- random forest (`randomForest`) with `h2o.randomForest`,  
+- gradient boosting (`gbm`) with `h2o.gbm`,  
+- extreme gradient boosting (`xgboost`) with `h2o.xgboost`,  
+- deep learning (`deeplearning`) with `h2o.deeplearning`,  
+- autoML (`automl`) with `h2o.automl`.  
 
 <p style='text-align: justify;'>
 In addition, deep learning is also possible to run in unsupervised form, by using it in <code>autoencoder</code> form.
+Also, three clustering methods are currently available:
+</p>
+
+- k-means with `kmeans` function from `stats` package,
+- expectation-maximization (EM) with `Mclust` package,
+- k-medoids (PAM) with `pam` function from `cluster` package.
+
+<p style='text-align: justify;'>
+In clustering case, the user doesn't have to choose a technique as all three are done in parallel and compared in terms of average silhouette width. There are also functions available to visualize the clustering results.
 </p>
 
 <p style='text-align: justify;'>

@@ -1,8 +1,8 @@
-# AI-JACK open source for R
-
 <img src="https://github.com/Bilot/AI-JACK-opensource-R/blob/master/logo/logo.png"/>
 
 <br>
+
+# AI-JACK open source for R
 
 ## *What is AI-JACK?*
 

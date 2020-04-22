@@ -2,7 +2,7 @@
 
 In this document you can find rough guidelines of how to contribute to AI-jack. This is a beta version and this is a guideline, not a set of rules. Feel free to propose changes to this document in a pull request.
 
-Thank you for your interest! In case of any questions, submit a new issue or contact github@bilot.fi.
+Thank you for your interest! In case of any questions, submit a new issue or contact ai.jack@bilot.fi.
 
 ## How to contribute?
 

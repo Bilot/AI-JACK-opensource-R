@@ -1,4 +1,6 @@
-<img src="https://github.com/Bilot/AI-JACK-opensource-R/blob/master/logo/logo.png"/>
+<p align="center">
+<img src="https://github.com/Bilot/AI-JACK-opensource-R/blob/master/logo/logo.png" width="700"/>
+</p>
 
 <br>
 

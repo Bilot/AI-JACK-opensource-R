@@ -564,7 +564,11 @@ create_models <- function(set,main,prep,odbc){
   model_names <- names(best_models)
   scores <- unlist(lapply(best_models,'[[','score'))
   names(scores) <- model_names
-  best <- which.max(scores)
+  if (metric %in% c("rmse", "mae")){
+    best <- which.min(scores)
+  }else{
+    best <- which.max(scores)
+  }
   metric <- fix_metric(set = set)
   print(paste0('   Best model: ',
                unlist(strsplit(names(best),'_'))[4],' -- ',

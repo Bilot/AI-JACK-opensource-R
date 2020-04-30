@@ -564,7 +564,9 @@ create_models <- function(set,main,prep,odbc){
   model_names <- names(best_models)
   scores <- unlist(lapply(best_models,'[[','score'))
   names(scores) <- model_names
-  if (metric %in% c("rmse", "mae")){
+  if (metric %in% c("rmse", "rmsle", "mae", "mse", "logloss", "deviance", "error", "fallout", "fnr", "fpr",
+                   "max_per_class_error", " mean_per_class_error", "mean_residual_deviance", "null_deviance", 
+                   "cat_err", "num_err", "gini")){
     best <- which.min(scores)
   }else{
     best <- which.max(scores)

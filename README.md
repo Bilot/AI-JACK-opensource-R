@@ -153,7 +153,7 @@ source('control/main_model.R')
 
 ### Data
 <p style='text-align: justify;'>
-The <b>AI-JACK</b> is primarily intended to be used for ML-project management in production. This means that while there are some pre-processing steps taking place, there is no functionality for data engineering, which is typically needed <em>before</em> modelling. That is, the intention is that the initial data analysis, investigation and engineering (including feature extraction/engineering) has been done prior to using <b>AI-JACK</b>. One clear reason for this is that data engineering is not easily generalised; it depends on the data what manipulations are needed / are most usefull. 
+The <b>AI-JACK</b> is primarily intended to be used for ML-project management in production. This means that while there are some pre-processing steps taking place, there is no functionality for data engineering, which is typically needed <em>before</em> modelling. That is, the intention is that the initial data analysis, investigation and engineering (including feature extraction/engineering) has been done prior to using <b>AI-JACK</b>. One clear reason for this is that data engineering is not easily generalised; it depends on the data what manipulations are needed / are most useful. 
 </p>
 
 <p style='text-align: justify;'>

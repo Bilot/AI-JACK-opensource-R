@@ -564,6 +564,7 @@ create_models <- function(set,main,prep,odbc){
   model_names <- names(best_models)
   scores <- unlist(lapply(best_models,'[[','score'))
   names(scores) <- model_names
+  metric <- fix_metric(set = set)
   if (metric %in% c("rmse", "rmsle", "mae", "mse", "logloss", "deviance", "error", "fallout", "fnr", "fpr",
                    "max_per_class_error", " mean_per_class_error", "mean_residual_deviance", "null_deviance", 
                    "cat_err", "num_err", "gini")){
@@ -571,7 +572,6 @@ create_models <- function(set,main,prep,odbc){
   }else{
     best <- which.max(scores)
   }
-  metric <- fix_metric(set = set)
   print(paste0('   Best model: ',
                unlist(strsplit(names(best),'_'))[4],' -- ',
                metric,': ',

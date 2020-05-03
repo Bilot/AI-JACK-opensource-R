@@ -238,4 +238,79 @@ export_clust_output <- function (output, set, prep, odbc)
   saveRDS(output$parameters, file = loc)
   path = paste(set$main$project_path, set$main$model_path, 
                sep = set$main$path_sep)
+  ggsave("clusters.png", viz_clusters(data$distance_matrix,clust = opt$EM$clustering), 
+         path = paste(set$main$project_path, set$main$model_path, 
+               sep = set$main$path_sep))
+  ggsave("silhouettes.png", viz_silhouette(opt), 
+         path = paste(set$main$project_path, set$main$model_path, 
+               sep = set$main$path_sep))
+}
+                           
+#' Function for visualizing clustering result.
+#'
+#' @param D distance matrix
+#' @param clust clustering model
+#' @param colors color scale
+#'
+#' @export plot
+
+viz_clusters <- function(D,clust,colors = NULL){
+  
+  if(is.null(colors)){
+    cols <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
+  } else {
+    cols <- colors
+  }
+  
+  ord <- cmdscale(D)
+  
+  data.frame(ord,clustering=as.factor(clust)) %>%
+    ggplot2::ggplot(.,aes(X1,X2,fill=clustering)) +
+    geom_point(shape=21,size=2,alpha=0.8)+
+    stat_ellipse(level = 0.9,geom='polygon',alpha=0.1)+
+    scale_fill_manual(values=cols,name='')+
+    theme_linedraw()+
+    theme(legend.position = 'top')+
+    xlab('Axis-1')+ylab('Axis-2')
+}
+
+#' Function for visualizing clustering metrics for a given model.
+#'
+#' @param opt clustering model
+#' @param colors color scale
+#'
+#' @export plot
+                           
+viz_silhouette <- function(opt, colors = NULL){
+  
+  if(is.null(colors)){
+    cols <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
+  } else {
+    cols <- colors
+  }
+  
+  df <- do.call(rbind,
+                lapply(names(opt),function(x){
+                  df <- as.data.frame(
+                    unclass(opt[[x]]$silhouette_widths)
+                  )
+                  df$method <- x
+                  return(df)
+                })
+  ) %>%
+    group_by(method,cluster) %>%
+    arrange(-sil_width,.by_group=T) %>%
+    group_by(method) %>%
+    mutate(x = 1:n())
+  
+  ggplot(df,aes(x,sil_width,
+                fill=as.factor(cluster),
+                col=as.factor(cluster)))+
+    geom_col(position = 'dodge')+
+    facet_wrap(~method,ncol = 1)+
+    theme_linedraw()+
+    scale_color_manual(values=cols,name='')+
+    scale_fill_manual(values=cols,name='')+
+    xlab('')+ylab(expression(paste('Silhouette width, ',S[i])))
+  
 }

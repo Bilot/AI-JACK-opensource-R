@@ -300,7 +300,7 @@ Currently, the following supervised modelling methods are available:
 - decision tree (`decisionTree`) with `h2o.randomForest` (`n_trees = 1`),  
 - random forest (`randomForest`) with `h2o.randomForest`,  
 - gradient boosting (`gbm`) with `h2o.gbm`,  
-- extreme gradient boosting (`xgboost`) with `h2o.xgboost`,  
+- extreme gradient boosting (`xgboost`) with `h2o.xgboost` (not available on Windows),  
 - deep learning (`deeplearning`) with `h2o.deeplearning`,  
 - autoML (`automl`) with `h2o.automl`.  
 

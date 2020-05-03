@@ -13,7 +13,7 @@
 #' @export
 
 cluster_dataprep <- function(X, set){
-  
+  library(caret)
   types <- set$cluster$col_types_used
   
   scaler <- function(x, method='standard'){

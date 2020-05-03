@@ -156,7 +156,7 @@ get_cluster_output <- function(set, runid, data){
   }
   perf <- foreach(ii = names(opt), .combine = rbind) %do% {
     data.frame(model_name = ii, 
-               avg_silhouette_widths = opt[ii][[1]]$avg_width))
+               avg_silhouette_widths = opt[ii][[1]]$avg_width)
   }
     
   apply_model <- data.frame(

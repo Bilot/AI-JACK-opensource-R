@@ -9,6 +9,8 @@ get_model_output(models, model_names, set, runid, h2o_data)
 \arguments{
 \item{models}{either a single model object or a list of models}
 
+\item{model_names}{a vector of model IDs}
+
 \item{set}{config object}
 
 \item{runid}{run ID}

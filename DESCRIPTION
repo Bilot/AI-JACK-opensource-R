@@ -7,7 +7,7 @@ Author: as.person(c(
     "Lasse Liukkonen <lasse.liukkonen@bilot.fi> [ctb]",
     "Jedrzej Furmann <jedrzej.furmann@bilot.pl> [ctb]"
   ))
-Maintainer: The package maintainer <lasse.ruokolainen@bilot.fi>
+Maintainer: The package maintainer <laruokol@gmail.com>
 Description: This package provides a Machine Learning framework for accelating both model development and application.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -35,8 +35,6 @@ Imports:
     mclust,
     randomForest,
     ggplot2
-    
-    
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
 Suggests:

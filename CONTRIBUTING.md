@@ -1,4 +1,4 @@
-# Contributing to AI-jack
+# Contributing to AI-JACK
 
 In this document you can find rough guidelines of how to contribute to AI-JACK. This is a guideline, not a set of rules. Feel free to propose changes to this document in a pull request.
 

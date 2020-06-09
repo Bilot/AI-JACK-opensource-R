@@ -40,6 +40,10 @@ This is the R-version of the <b>AI-JACK</b> (we also have a Python version, whic
 <br>
 
 ## *How to use it?*
+We organize __webinars__! There are two upcoming events where we show briefly how to use AI-JACK and our past experiences in implementing the tool in production. If you want to see real use cases - you're welcome to join us!
+
+- [June 18th, 2020 - in Polish](https://bilot.group/pl/event/webinar-ai-jack-silnik-ktory-napedzi-uczenie-maszynowe-w-twoim-biznesie-2/)
+- [June 24th, 2020 - in English](https://bilot.group/event/webinar-ai-jack-the-engine-that-boosts-machine-learning-in-your-business/)
 
 ### Installation & setup
 <p style='text-align: justify;'>

@@ -4,7 +4,7 @@ In this document you can find rough guidelines of how to contribute to AI-JACK. 
 
 ## Rewards
 
-Contributions are rewarded! If you provide a valuable enhancement, bug fixes, or suggest new features to AI-JACK, we'll send you AI-JACK stickers with some small gift :) 
+Contributions are rewarded! If you provide a valuable enhancement, bug fixes, or suggest new useful features to AI-JACK, we'll send you AI-JACK stickers with a small gift :) 
 
 Thank you for your interest! In case of any questions, submit a new issue or contact ai.jack@bilot.fi.
 

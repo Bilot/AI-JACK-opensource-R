@@ -1,6 +1,10 @@
 # Contributing to AI-jack
 
-In this document you can find rough guidelines of how to contribute to AI-jack. This is a beta version and this is a guideline, not a set of rules. Feel free to propose changes to this document in a pull request.
+In this document you can find rough guidelines of how to contribute to AI-JACK. This is a guideline, not a set of rules. Feel free to propose changes to this document in a pull request.
+
+## Rewards
+
+Contributions are rewarded! If you provide a valuable enhancement, bug fixes, or suggest new features to AI-JACK, we'll send you AI-JACK stickers with some small gift :) 
 
 Thank you for your interest! In case of any questions, submit a new issue or contact ai.jack@bilot.fi.
 

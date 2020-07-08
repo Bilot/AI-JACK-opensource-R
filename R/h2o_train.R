@@ -484,7 +484,7 @@ create_models <- function(set,main,prep,odbc){
 
   allowed = c('glm','gbm','xgboost',
               'decisionTree','randomForest',
-              'deeplearning','automl')
+              'deeplearning','automl', 'timeseries')
 
   test = to_train %in% allowed
   if(!all(test)){
@@ -509,7 +509,7 @@ create_models <- function(set,main,prep,odbc){
   best_models = list()
   # Train single-estimator superviser models:
   for(estimator in set$model$train_models){
-    if(estimator %in% c('automl','isoForest')){
+    if(estimator %in% c('automl', 'timeseries', 'isoForest')){
       next()
     }
     print(paste0('   Building ',estimator,' model...'),
@@ -521,7 +521,7 @@ create_models <- function(set,main,prep,odbc){
   }
   
   # Train autoML models:
-  if(to_train == 'automl'){
+  if(to_train %in% c('timeseries', 'automl')){
     best_models <- train_automl_model(df = h2o_data,
                                       set = set,
                                       runid = prep$runid)
@@ -593,7 +593,8 @@ create_models <- function(set,main,prep,odbc){
                       output = output,
                       set = set,
                       prep = prep,
-                      odbc = odbc)
+                      odbc = odbc,
+                      h2o_data = h2o_data)
 
   print_time(start)
 }

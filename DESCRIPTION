@@ -3,11 +3,11 @@ Type: Package
 Title: Package for Machine Learning project handling
 Version: 1.0.0
 Author: as.person(c(
-    "Lasse Ruokolainen <lasse.ruokolainen@bilot.fi> [aut, cre]",
+    "Lasse Ruokolainen <laruokol@gmail.com> [aut, cre]",
     "Lasse Liukkonen <lasse.liukkonen@bilot.fi> [ctb]",
     "Jedrzej Furmann <jedrzej.furmann@bilot.pl> [ctb]"
   ))
-Maintainer: The package maintainer <lasse.ruokolainen@bilot.fi>
+Maintainer: The package maintainer <laruokol@gmail.com>
 Description: This package provides a Machine Learning framework for accelating both model development and application.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -34,10 +34,10 @@ Imports:
     factoextra,
     mclust,
     randomForest,
-    ggplot2
-    
-    
+    ggplot2,
+    timetk,
+    tidyquant
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Suggests:
     testthat

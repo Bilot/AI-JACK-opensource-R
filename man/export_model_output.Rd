@@ -4,7 +4,7 @@
 \alias{export_model_output}
 \title{Function for writing model outputs}
 \usage{
-export_model_output(models, output, set, prep, odbc)
+export_model_output(models, output, set, prep, odbc, h2o_data)
 }
 \arguments{
 \item{models}{a list of trained models}
@@ -16,6 +16,8 @@ export_model_output(models, output, set, prep, odbc)
 \item{prep}{summary object}
 
 \item{odbc}{ODBC connection file (only needed when using DB connection)}
+
+\item{h2o_data}{h2o data frame}
 }
 \value{
 (1) Model fit measures, Featurwe importances (for ML models),

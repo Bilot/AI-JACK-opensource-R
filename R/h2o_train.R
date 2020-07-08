@@ -484,7 +484,7 @@ create_models <- function(set,main,prep,odbc){
 
   allowed = c('glm','gbm','xgboost',
               'decisionTree','randomForest',
-              'deeplearning','automl')
+              'deeplearning','automl', 'timeseries')
 
   test = to_train %in% allowed
   if(!all(test)){
@@ -509,7 +509,7 @@ create_models <- function(set,main,prep,odbc){
   best_models = list()
   # Train single-estimator superviser models:
   for(estimator in set$model$train_models){
-    if(estimator %in% c('automl','isoForest')){
+    if(estimator %in% c('automl', 'timeseries', 'isoForest')){
       next()
     }
     print(paste0('   Building ',estimator,' model...'),
@@ -521,7 +521,7 @@ create_models <- function(set,main,prep,odbc){
   }
   
   # Train autoML models:
-  if(to_train == 'automl'){
+  if(to_train %in% c('timeseries', 'automl')){
     best_models <- train_automl_model(df = h2o_data,
                                       set = set,
                                       runid = prep$runid)
@@ -564,8 +564,14 @@ create_models <- function(set,main,prep,odbc){
   model_names <- names(best_models)
   scores <- unlist(lapply(best_models,'[[','score'))
   names(scores) <- model_names
-  best <- which.max(scores)
   metric <- fix_metric(set = set)
+  if (metric %in% c("rmse", "rmsle", "mae", "mse", "logloss", "deviance", "error", "fallout", "fnr", "fpr",
+                   "max_per_class_error", " mean_per_class_error", "mean_residual_deviance", "null_deviance", 
+                   "cat_err", "num_err", "gini")){
+    best <- which.min(scores)
+  }else{
+    best <- which.max(scores)
+  }
   print(paste0('   Best model: ',
                unlist(strsplit(names(best),'_'))[4],' -- ',
                metric,': ',
@@ -587,7 +593,8 @@ create_models <- function(set,main,prep,odbc){
                       output = output,
                       set = set,
                       prep = prep,
-                      odbc = odbc)
+                      odbc = odbc,
+                      h2o_data = h2o_data)
 
   print_time(start)
 }

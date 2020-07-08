@@ -3,6 +3,21 @@
 # Any user is free to modify this software for their 
 # own needs, bearing in mind that it comes with no warranty.
 
+#automl_leader <- automl_models_h2o@leader
+#pred_h2o <- h2o.predict(automl_leader, newdata = test_h2o)
+#h2o.performance(automl_leader, newdata = test_h2o)
+
+#error_tbl <- X %>% 
+#  top_n(n = nrow(test_tbl), date) %>%
+#  add_column(pred = pred_h2o %>% as_tibble() %>% pull(predict)) %>%
+#  rename(actual = value) %>%
+#  mutate(
+ #   error     = actual - pred,
+#    error_pct = error / actual
+#  ) 
+#error_tbl
+
+
 #' Wrapper Function for preparing data to apply clustering methods.
 #'
 #' @param X data object
@@ -13,7 +28,6 @@
 #' @export
 
 cluster_dataprep <- function(X, set){
-  
   types <- set$cluster$col_types_used
   
   scaler <- function(x, method='standard'){
@@ -157,8 +171,7 @@ get_cluster_output <- function(set, runid, data){
   }
   perf <- foreach(ii = names(opt), .combine = rbind) %do% {
     data.frame(model_name = ii, 
-               avg_silhouette_widths = opt[ii][[1]]$avg_width, 
-               clusters_avg_silhouette_widths = as.list(opt[ii][[1]]$clust_avg_widths))
+               avg_silhouette_widths = opt[ii][[1]]$avg_width)
   }
     
   apply_model <- data.frame(
@@ -181,3 +194,184 @@ get_cluster_output <- function(set, runid, data){
     )
   )
 }
+
+#' Function for saving models results to output.
+#'
+#' @param output clustering results
+#' @param set config object
+#' @param prep config object
+#' @param odbc db connection
+#'
+#' @export
+                           
+export_clust_output <- function (output, set, prep, odbc) 
+{
+  if (set$main$use_db) {
+    write_db(channel = odbc$value$odbc_metadata, output$model_fit_measures, 
+             set$odbc$result$acc)
+    write_db(channel = odbc$value$odbc_metadata, output$apply_model, 
+             set$odbc$result$model)
+    write_db(channel = odbc$value$odbc_validation, output$predictions, 
+             set$odbc$result$val)
+    write_db(channel = odbc$value$odbc_metadata, output$feature_importance, 
+             set$odbc$result$imp)
+    write_db(channel = odbc$value$odbc_metadata_azuredb, 
+             output$model_fit_measures, set$odbc$result$acc)
+    write_db(channel = odbc$value$odbc_metadata_azuredb, 
+             output$apply_model, set$odbc$result$model)
+  }else {
+    write_csv(set, output$model_fit_measures, paste(set$csv$result$prefix, 
+                                                    set$csv$result$acc, sep = set$main$path_sep), append = T)
+    write_csv(set, output$apply_model, paste(set$csv$result$prefix, 
+                                             set$csv$result$model, sep = set$main$path_sep), append = T)
+    write_csv(set, output$predictions, paste(set$csv$result$prefix, 
+                                             set$csv$result$val, sep = set$main$path_sep), append = set$main$append_predicts, 
+              colnames = c("executionid", "model_name", 
+                           "row_identifier", "obs"))
+    if (length(output$coefficients) > 0) {
+      write_csv(set, output$coefficients, paste(set$csv$result$prefix, 
+                                                set$csv$result$coef, sep = set$main$path_sep), 
+                append = TRUE)
+    }
+    if (length(output$feature_importance) > 0) {
+      write_csv(set, output$feature_importance, paste(set$csv$result$prefix, 
+                                                      set$csv$result$imp, sep = set$main$path_sep), 
+                append = TRUE)
+    }
+  }
+  loc <- paste0(set$main$project_path, set$main$path_sep, "output_model", 
+                set$main$path_sep, "factor_levels", set$main$path_sep, 
+                paste(prep$runid, set$main$model_name_part, set$main$label, 
+                      "factorLevels.rds", sep = "_"))
+  saveRDS(output$factor_levels, file = loc)
+  loc <- paste0(set$main$project_path, set$main$path_sep, "output_model", 
+                set$main$path_sep, "parameters", set$main$path_sep, 
+                paste(prep$runid, set$main$model_name_part, set$main$label, 
+                      "parameters.rds", sep = "_"))
+  saveRDS(output$parameters, file = loc)
+  path = paste(set$main$project_path, set$main$model_path, 
+               sep = set$main$path_sep)
+  ggsave("clusters.png", viz_clusters(data$distance_matrix,clust = opt$EM$clustering), 
+         path = paste(set$main$project_path, set$main$model_path, 
+               sep = set$main$path_sep))
+  ggsave("silhouettes.png", viz_silhouette(opt), 
+         path = paste(set$main$project_path, set$main$model_path, 
+               sep = set$main$path_sep))
+}
+                           
+#' Function for visualizing clustering result.
+#'
+#' @param D distance matrix
+#' @param clust clustering model
+#' @param colors color scale
+#'
+#' @export
+
+viz_clusters <- function(D,clust,colors = NULL){
+  
+  if(is.null(colors)){
+    cols <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
+  } else {
+    cols <- colors
+  }
+  
+  ord <- cmdscale(D)
+  
+  data.frame(ord,clustering=as.factor(clust)) %>%
+    ggplot2::ggplot(.,aes(X1,X2,fill=clustering)) +
+    geom_point(shape=21,size=2,alpha=0.8)+
+    stat_ellipse(level = 0.9,geom='polygon',alpha=0.1)+
+    scale_fill_manual(values=cols,name='')+
+    theme_linedraw()+
+    theme(legend.position = 'top')+
+    xlab('Axis-1')+ylab('Axis-2')
+}
+
+#' Function for visualizing clustering metrics for a given model.
+#'
+#' @param opt clustering model
+#' @param colors color scale
+#'
+#' @export
+                           
+viz_silhouette <- function(opt, colors = NULL){
+  
+  if(is.null(colors)){
+    cols <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#0072B2", "#D55E00", "#CC79A7")
+  } else {
+    cols <- colors
+  }
+  
+  df <- do.call(rbind,
+                lapply(names(opt),function(x){
+                  df <- as.data.frame(
+                    unclass(opt[[x]]$silhouette_widths)
+                  )
+                  df$method <- x
+                  return(df)
+                })
+  ) %>%
+    group_by(method,cluster) %>%
+    arrange(-sil_width,.by_group=T) %>%
+    group_by(method) %>%
+    mutate(x = 1:n())
+  
+  ggplot(df,aes(x,sil_width,
+                fill=as.factor(cluster),
+                col=as.factor(cluster)))+
+    geom_col(position = 'dodge')+
+    facet_wrap(~method,ncol = 1)+
+    theme_linedraw()+
+    scale_color_manual(values=cols,name='')+
+    scale_fill_manual(values=cols,name='')+
+    xlab('')+ylab(expression(paste('Silhouette width, ',S[i])))
+  
+}
+
+#' Function for visualizing observed data used in time series model.
+#'
+#' @param h2o_data h2o data frame
+#'
+#' @export
+
+viz_ts <- function(h2o_data){
+  
+  train <- as.data.frame(h2o_data$train)
+  train$test_train_val <- "train"
+  train$predictions <- NA
+  test <- as.data.frame(h2o_data$test)
+  test$test_train_val <- "test"
+  test$predictions <- NA
+  val <- as.data.frame(h2o_data$val)
+  val$test_train_val <- "val"
+  val$predictions <- as.vector(preds)
+  
+  data <- rbind(train, test, val)
+  
+  data %>%
+    mutate(date = as.Date(ymd_hms(paste(year, month, day, hour, minute, second)))) %>%
+    ggplot(aes(date, data[,1])) +
+    geom_rect(xmin = as.Date(min(data[data$test_train_val == "train",]$index.num)/86400), 
+              xmax = as.Date(max(data[data$test_train_val == "train",]$index.num)/86400),
+              ymin = 0, ymax = Inf, alpha = 0.02,
+              fill = palette_light()[[5]]) +
+    # Validation Region
+    geom_rect(xmin = as.Date(min(data[data$test_train_val == "val",]$index.num)/86400), 
+              xmax = as.Date(max(data[data$test_train_val == "val",]$index.num)/86400),
+              ymin = 0, ymax = Inf, alpha = 0.02,
+              fill = palette_light()[[3]]) +
+    # Test Region
+    geom_rect(xmin = as.Date(min(data[data$test_train_val == "test",]$index.num)/86400), 
+              xmax = as.Date(max(data[data$test_train_val == "test",]$index.num)/86400),
+              ymin = 0, ymax = Inf, alpha = 0.02,
+              fill = palette_light()[[4]]) +
+    # Data
+    geom_line(col = palette_light()[1]) +
+    geom_point(col = palette_light()[1]) +
+    geom_ma(ma_fun = SMA, n = 12, size = 1) +
+    # Aesthetics
+    theme_tq() +
+    labs(title = "Target value changes over time",
+         subtitle = "Train, Validation, and Test Sets Shown")
+}
+

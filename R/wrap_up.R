@@ -27,9 +27,6 @@ clean_up = function(){
 #'
 #' @param result_path where to find results tables?
 #'
-#' @examples
-#' clear_model_results(result_path)
-#'
 #' @description
 #' This function clears result tables
 #' by removing all rows, except for the

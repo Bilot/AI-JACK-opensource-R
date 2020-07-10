@@ -46,7 +46,7 @@ make_h2o_data <- function(df,set){
     library(tidyquant)
     X <- main$constants_deleted$value
     X[,1] <- as.Date(X[,1])
-    X <- as_tibble(X)
+    X <- tibble::as_tibble(X)
     X <- X %>%
       select(1:3) %>%
       tk_augment_timeseries_signature()

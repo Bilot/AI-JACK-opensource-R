@@ -62,8 +62,8 @@ make_h2o_data <- function(df,set){
 
     
     x_h2o_train <- as.h2o(train_tbl)
-    x_h2o_val <- as.h2o(valid_tbl)
-    x_h2o_test <- as.h2o(test_tbl)
+    x_h2o_test <- as.h2o(valid_tbl) # names of test and val are switched on purpose
+    x_h2o_val <- as.h2o(test_tbl)
   }else{
 
     x_train = df[[source]]$value$train

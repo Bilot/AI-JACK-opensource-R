@@ -334,18 +334,13 @@ viz_silhouette <- function(opt, colors = NULL){
 #'
 #' @export
 
-viz_ts <- function(h2o_data, output, model){
-  
+viz_ts <- function(h2o_data){
   train <- as.data.frame(h2o_data$train)
   train$test_train_val <- "train"
-  train$predictions <- NA
   test <- as.data.frame(h2o_data$test)
   test$test_train_val <- "test"
-  test$predictions <- NA
   val <- as.data.frame(h2o_data$val)
   val$test_train_val <- "val"
-  val$predictions <- as.vector(output$predictions[output$predictions$model_name == model,]$pred)
-  
   data <- rbind(train, test, val)
   
   data %>%
@@ -355,7 +350,7 @@ viz_ts <- function(h2o_data, output, model){
               xmax = as.Date(max(data[data$test_train_val == "train",]$index.num)/86400),
               ymin = 0, ymax = Inf, alpha = 0.02,
               fill = palette_light()[[5]]) +
-    # Validation Region
+      # Validation Region
     geom_rect(xmin = as.Date(min(data[data$test_train_val == "val",]$index.num)/86400), 
               xmax = as.Date(max(data[data$test_train_val == "val",]$index.num)/86400),
               ymin = 0, ymax = Inf, alpha = 0.02,
@@ -373,5 +368,46 @@ viz_ts <- function(h2o_data, output, model){
     theme_tq() +
     labs(title = "Target value changes over time",
          subtitle = "Train, Validation, and Test Sets Shown")
-}
 
+}
+                           
+#' Function for visualizing accuracy of predictive time series models.
+#'
+#' @param h2o_data h2o data frame
+#' @param output list of models' parameters
+#' @param models list of generated time series models
+#'
+#' @export
+
+viz_ts2 <- function(h2o_data, output, models){
+  i = 0
+  plots <- list()
+  for(ii in models){
+    i <- i + 1
+    train <- as.data.frame(h2o_data$train)
+    train$test_train_val <- "train"
+    train$predictions <- NA
+    test <- as.data.frame(h2o_data$test)
+    test$test_train_val <- "test"
+    test$predictions <- NA
+    val <- as.data.frame(h2o_data$val)
+    val$test_train_val <- "val"
+    val$predictions <- as.vector(output$predictions[output$predictions$model_name == ii,]$pred)
+    
+    data <- rbind(train, test, val)
+    
+    plots[[i]] <- data %>%
+      filter(test_train_val == "val") %>%
+      mutate(date = as.Date(ymd_hms(paste(year, month, day, hour, minute, second)))) %>%
+      ggplot(aes(date)) +
+      geom_line(aes(y = data[data$test_train_val == "val",1], colour = "observed")) +
+      geom_line(aes(y = predictions, colour = "predicted")) +
+      scale_colour_manual(values = c(observed = "red", predicted = "blue")) +
+      theme_tq() +
+      ylab("value") +
+      labs(title = "Prediction accuracy on validation set",
+           subtitle = ii)
+  }
+  require(gridExtra)
+  do.call(grid.arrange, plots)
+}

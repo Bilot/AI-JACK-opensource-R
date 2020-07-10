@@ -346,8 +346,8 @@ viz_ts <- function(h2o_data){
   data %>%
     mutate(date = as.Date(ymd_hms(paste(year, month, day, hour, minute, second)))) %>%
     ggplot(aes(date, data[,1])) +
-    geom_rect(xmin = as.Date(min(data[data$test_train_val == "train",]$index.num)/86400), 
-              xmax = as.Date(max(data[data$test_train_val == "train",]$index.num)/86400),
+    geom_rect(xmin = min(data[data$test_train_val == "train",]$index.num)/86400, 
+              xmax = max(data[data$test_train_val == "train",]$index.num)/86400,
               ymin = 0, ymax = Inf, alpha = 0.02,
               fill = palette_light()[[5]]) +
       # Validation Region

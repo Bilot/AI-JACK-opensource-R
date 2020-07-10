@@ -351,13 +351,13 @@ viz_ts <- function(h2o_data){
               ymin = 0, ymax = Inf, alpha = 0.02,
               fill = palette_light()[[5]]) +
       # Validation Region
-    geom_rect(xmin = as.Date(min(data[data$test_train_val == "val",]$index.num)/86400), 
-              xmax = as.Date(max(data[data$test_train_val == "val",]$index.num)/86400),
+    geom_rect(xmin = min(data[data$test_train_val == "val",]$index.num)/86400, 
+              xmax = max(data[data$test_train_val == "val",]$index.num)/86400,
               ymin = 0, ymax = Inf, alpha = 0.02,
               fill = palette_light()[[3]]) +
     # Test Region
-    geom_rect(xmin = as.Date(min(data[data$test_train_val == "test",]$index.num)/86400), 
-              xmax = as.Date(max(data[data$test_train_val == "test",]$index.num)/86400),
+    geom_rect(xmin = min(data[data$test_train_val == "test",]$index.num)/86400, 
+              xmax = max(data[data$test_train_val == "test",]$index.num)/86400,
               ymin = 0, ymax = Inf, alpha = 0.02,
               fill = palette_light()[[4]]) +
     # Data

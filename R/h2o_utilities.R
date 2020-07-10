@@ -398,7 +398,7 @@ export_model_output <- function(models, output, set, prep, odbc, h2o_data){
   
   # (6) Save visuals if there are such: ----
   if("timeseries" %in% set$model$train_models){
-  ggsave("time_series.png", viz_ts(data$distance_matrix,clust = opt$EM$clustering), 
+  ggsave("time_series.png", viz_ts(data$distance_matrix) 
          path = paste(set$main$project_path, set$main$model_path, 
                       sep = set$main$path_sep))
   }

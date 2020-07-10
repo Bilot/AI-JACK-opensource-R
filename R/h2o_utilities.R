@@ -398,8 +398,11 @@ export_model_output <- function(models, output, set, prep, odbc, h2o_data){
   
   # (6) Save visuals if there are such: ----
   if("timeseries" %in% set$model$train_models){
-  ggsave("time_series.png", viz_ts(h2o_data, output, model = ii), 
-         path = paste(set$main$project_path, set$main$model_path, 
-                      sep = set$main$path_sep))
+    ggsave("time_series.png", viz_ts(h2o_data), 
+          path = paste(set$main$project_path, set$main$model_path, 
+                        sep = set$main$path_sep))
+    ggsave("time_series_accuracy.png", viz_ts2(h2o_data, output, models = names(models)), 
+            path = paste(set$main$project_path, set$main$model_path, 
+                        sep = set$main$path_sep))  
   }
 }

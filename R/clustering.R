@@ -405,7 +405,7 @@ viz_ts2 <- function(h2o_data, output, models){
       scale_colour_manual(values = c(observed = "red", predicted = "blue")) +
       theme_tq() +
       ylab("value") +
-      labs(title = "Prediction accuracy on validation set",
+      labs(title = "Prediction accuracy on test set",
            subtitle = ii)
   }
   require(gridExtra)

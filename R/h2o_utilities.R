@@ -45,7 +45,7 @@ make_h2o_data <- function(df,set){
     library(timetk)
     library(tidyquant)
     X <- main$constants_deleted$value
-    X[,1] <- as.Date(X[,1])
+    X[,1] <- as.Date(dmy(X[,1]))
     X <- tibble::as_tibble(X)
     X <- X %>%
       select(1:3) %>%

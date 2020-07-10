@@ -334,7 +334,7 @@ viz_silhouette <- function(opt, colors = NULL){
 #'
 #' @export
 
-viz_ts <- function(h2o_data){
+viz_ts <- function(h2o_data, output, model){
   
   train <- as.data.frame(h2o_data$train)
   train$test_train_val <- "train"
@@ -344,7 +344,7 @@ viz_ts <- function(h2o_data){
   test$predictions <- NA
   val <- as.data.frame(h2o_data$val)
   val$test_train_val <- "val"
-  val$predictions <- as.vector(preds)
+  val$predictions <- as.vector(output$predictions[output$predictions$model_name == model,]$pred)
   
   data <- rbind(train, test, val)
   

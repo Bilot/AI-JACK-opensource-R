@@ -34,8 +34,10 @@ Imports:
     factoextra,
     mclust,
     randomForest,
-    ggplot2
+    ggplot2,
+    timetk,
+    tidyquant
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Suggests:
     testthat

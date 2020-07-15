@@ -27,7 +27,3 @@ where the \code{result} folder is located.
 
 This function clears information from result tables
 }
-\examples{
-clear_model_results(result_path)
-
-}

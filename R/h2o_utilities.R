@@ -40,15 +40,41 @@ make_h2o_data <- function(df,set){
   }else{
     source = "splitted"
   }
+  
+  if('timeseries' %in% set$model$train_models){
+    library(timetk)
+    library(tidyquant)
+    X <- main$constants_deleted$value
+    X[,1] <- as.Date(dmy(X[,1]))
+    X <- tibble::as_tibble(X)
+    X <- X %>%
+      select(1:3) %>%
+      tk_augment_timeseries_signature()
+    
+    X <- X %>%
+      select_if(~ !is.Date(.)) %>%
+      select_if(~ !any(is.na(.))) %>%
+      mutate_if(is.ordered, ~ as.character(.) %>% as.factor)
+    
+    train_tbl <- X %>% top_frac(-.7, index.num)
+    test_tbl  <- X %>% top_frac(.15, index.num)
+    valid_tbl <- X %>% filter(!(index.num %in% train_tbl$index.num), !(index.num %in% test_tbl$index.num))
 
-  x_train = df[[source]]$value$train
-  x_test = df[[source]]$value$test
-  x_val = df[[source]]$value$val
+    
+    x_h2o_train <- as.h2o(train_tbl)
+    x_h2o_test <- as.h2o(valid_tbl) # names of test and val are switched on purpose
+    x_h2o_val <- as.h2o(test_tbl)
+  }else{
 
-  # Create h2o-Frames:
-  x_h2o_train <- as.h2o(x_train)
-  x_h2o_test <- as.h2o(x_test)
-  x_h2o_val <- as.h2o(x_val)
+    x_train = df[[source]]$value$train
+    x_test = df[[source]]$value$test
+    x_val = df[[source]]$value$val
+  
+    # Create h2o-Frames:
+    x_h2o_train <- as.h2o(x_train)
+    x_h2o_test <- as.h2o(x_test)
+    x_h2o_val <- as.h2o(x_val)
+  }
   full_h2o_train <- h2o.rbind(x_h2o_train, x_h2o_test)
 
   return(
@@ -97,9 +123,9 @@ fix_metric <- function(set){
   metric <- ifelse(set$main$labeliscategory,
                    set$model$acc_metric_class,
                    set$model$acc_metric_reg)
-  metric <- ifelse(metric %in%
-                     c('mae','auc','rmse','mse','rmsle'),
-                   toupper(metric),metric)
+#  metric <- ifelse(metric %in%
+#                     c('mae','auc','rmse','mse','rmsle'),
+#                   toupper(metric),metric)
   return(metric)
 }
 
@@ -166,7 +192,7 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
   }
 
   # (3) Predict for valid-set: ----
-  val_frame <- as.h2o(main$splitted$value$val)
+  val_frame <- h2o_data$val
   # (3.1) Other than anomaly detection: ----
   anomaly <- grep('isoForest',names(models),value = T)
   nam <- setdiff(names(models),anomaly)
@@ -270,6 +296,7 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
 #' @param set config object
 #' @param prep summary object
 #' @param odbc ODBC connection file (only needed when using DB connection)
+#' @param h2o_data h2o data frame
 #'
 #' @return (1) Model fit measures, Featurwe importances (for ML models),
 #' Model coefficients (GLM models),
@@ -280,7 +307,7 @@ get_model_output <- function(models, model_names, set, runid, h2o_data){
 #'
 #' @export
 
-export_model_output <- function(models, output, set, prep, odbc){
+export_model_output <- function(models, output, set, prep, odbc, h2o_data){
 
   # Write warnings, fitmeasures, validation predictions and model apply information
   if(set$main$use_db) {
@@ -367,5 +394,15 @@ export_model_output <- function(models, output, set, prep, odbc){
     #h2o.saveModel(object = models[[ii]],
     #             path = path,
     #             force = T)
+  }
+  
+  # (6) Save visuals if there are such: ----
+  if("timeseries" %in% set$model$train_models){
+    ggsave("time_series.png", viz_ts(h2o_data), 
+          path = paste(set$main$project_path, set$main$model_path, 
+                        sep = set$main$path_sep))
+    ggsave("time_series_accuracy.png", viz_ts2(h2o_data, output, models = names(models)), 
+            path = paste(set$main$project_path, set$main$model_path, 
+                        sep = set$main$path_sep))  
   }
 }

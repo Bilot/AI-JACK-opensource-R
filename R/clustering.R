@@ -3,6 +3,21 @@
 # Any user is free to modify this software for their 
 # own needs, bearing in mind that it comes with no warranty.
 
+#automl_leader <- automl_models_h2o@leader
+#pred_h2o <- h2o.predict(automl_leader, newdata = test_h2o)
+#h2o.performance(automl_leader, newdata = test_h2o)
+
+#error_tbl <- X %>% 
+#  top_n(n = nrow(test_tbl), date) %>%
+#  add_column(pred = pred_h2o %>% as_tibble() %>% pull(predict)) %>%
+#  rename(actual = value) %>%
+#  mutate(
+ #   error     = actual - pred,
+#    error_pct = error / actual
+#  ) 
+#error_tbl
+
+
 #' Wrapper Function for preparing data to apply clustering methods.
 #'
 #' @param X data object
@@ -250,7 +265,7 @@ export_clust_output <- function (output, set, prep, odbc)
 #' @param clust clustering model
 #' @param colors color scale
 #'
-#' @export plot
+#' @export
 
 viz_clusters <- function(D,clust,colors = NULL){
   
@@ -277,7 +292,7 @@ viz_clusters <- function(D,clust,colors = NULL){
 #' @param opt clustering model
 #' @param colors color scale
 #'
-#' @export plot
+#' @export
                            
 viz_silhouette <- function(opt, colors = NULL){
   
@@ -311,4 +326,88 @@ viz_silhouette <- function(opt, colors = NULL){
     scale_fill_manual(values=cols,name='')+
     xlab('')+ylab(expression(paste('Silhouette width, ',S[i])))
   
+}
+
+#' Function for visualizing observed data used in time series model.
+#'
+#' @param h2o_data h2o data frame
+#'
+#' @export
+
+viz_ts <- function(h2o_data){
+  train <- as.data.frame(h2o_data$train)
+  train$test_train_val <- "train"
+  test <- as.data.frame(h2o_data$test)
+  test$test_train_val <- "test"
+  val <- as.data.frame(h2o_data$val)
+  val$test_train_val <- "val"
+  data <- rbind(train, test, val)
+  
+  data %>%
+    mutate(date = as.Date(ymd_hms(paste(year, month, day, hour, minute, second)))) %>%
+    ggplot(aes(date, data[,1])) +
+    geom_rect(xmin = min(data[data$test_train_val == "train",]$index.num)/86400, 
+              xmax = max(data[data$test_train_val == "train",]$index.num)/86400,
+              ymin = 0, ymax = Inf, alpha = 0.02,
+              fill = palette_light()[[5]]) +
+      # Validation Region
+    geom_rect(xmin = min(data[data$test_train_val == "val",]$index.num)/86400, 
+              xmax = max(data[data$test_train_val == "val",]$index.num)/86400,
+              ymin = 0, ymax = Inf, alpha = 0.02,
+              fill = palette_light()[[3]]) +
+    # Test Region
+    geom_rect(xmin = min(data[data$test_train_val == "test",]$index.num)/86400, 
+              xmax = max(data[data$test_train_val == "test",]$index.num)/86400,
+              ymin = 0, ymax = Inf, alpha = 0.02,
+              fill = palette_light()[[4]]) +
+    # Data
+    geom_line(col = palette_light()[1]) +
+    geom_point(col = palette_light()[1]) +
+    geom_ma(ma_fun = SMA, n = 12, size = 1) +
+    # Aesthetics
+    theme_tq() +
+    labs(title = "Target value changes over time",
+         subtitle = "Train, Validation, and Test Sets Shown")
+
+}
+                           
+#' Function for visualizing accuracy of predictive time series models.
+#'
+#' @param h2o_data h2o data frame
+#' @param output list of models' parameters
+#' @param models list of generated time series models
+#'
+#' @export
+
+viz_ts2 <- function(h2o_data, output, models){
+  i = 0
+  plots <- list()
+  for(ii in models){
+    i <- i + 1
+    train <- as.data.frame(h2o_data$train)
+    train$test_train_val <- "train"
+    train$predictions <- NA
+    test <- as.data.frame(h2o_data$test)
+    test$test_train_val <- "test"
+    test$predictions <- NA
+    val <- as.data.frame(h2o_data$val)
+    val$test_train_val <- "val"
+    val$predictions <- as.vector(output$predictions[output$predictions$model_name == ii,]$pred)
+    
+    data <- rbind(train, test, val)
+    
+    plots[[i]] <- data %>%
+      filter(test_train_val == "val") %>%
+      mutate(date = as.Date(ymd_hms(paste(year, month, day, hour, minute, second)))) %>%
+      ggplot(aes(date)) +
+      geom_line(aes(y = data[data$test_train_val == "val",1], colour = "observed")) +
+      geom_line(aes(y = predictions, colour = "predicted")) +
+      scale_colour_manual(values = c(observed = "red", predicted = "blue")) +
+      theme_tq() +
+      ylab("value") +
+      labs(title = "Prediction accuracy on test set",
+           subtitle = ii)
+  }
+  require(gridExtra)
+  do.call(grid.arrange, plots)
 }

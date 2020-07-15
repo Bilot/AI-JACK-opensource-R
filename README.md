@@ -306,7 +306,12 @@ Currently, the following supervised modelling methods are available:
 - gradient boosting (`gbm`) with `h2o.gbm`,  
 - extreme gradient boosting (`xgboost`) with `h2o.xgboost` (not available on Windows),  
 - deep learning (`deeplearning`) with `h2o.deeplearning`,  
-- autoML (`automl`) with `h2o.automl`.  
+- autoML (`automl`) with `h2o.automl`,
+- time series (`timeseries`) with `h2o.automl`.
+
+<p style='text-align: justify;'>
+In order to use time series feature correctly, your dataset currently needs to have a numeric value column (specified in `label` part in configuration file) and date column in dd.mm.yyyy, dd/mm/yy, dd/mm/yyyy or similar format - condition is that `dmy` function from `lubridate` package reads it. Other format options will be added soon.
+</p>
 
 <p style='text-align: justify;'>
 In addition, deep learning is also possible to run in unsupervised form, by using it in <code>autoencoder</code> form.

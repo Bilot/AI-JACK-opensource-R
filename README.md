@@ -310,7 +310,7 @@ Currently, the following supervised modelling methods are available:
 - time series (`timeseries`) with `h2o.automl`.
 
 <p style='text-align: justify;'>
-In order to use time series feature correctly, your dataset currently needs to have a numeric value column (specified in `label` part in configuration file) and date column in dd.mm.yyyy, dd/mm/yy, dd/mm/yyyy or similar format - condition is that `dmy` function from `lubridate` package reads it. Other format options will be added soon.
+In order to use time series feature correctly, your dataset currently needs to have a numeric value column (specified in <code>label</code> part in configuration file) and date column in dd.mm.yyyy, dd/mm/yy, dd/mm/yyyy or similar format - condition is that <code>dmy</code> function from <code>lubridate</code> package reads it. Other format options will be added soon.
 </p>
 
 <p style='text-align: justify;'>

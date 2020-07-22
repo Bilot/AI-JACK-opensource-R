@@ -544,21 +544,21 @@ create_models <- function(set,main,prep,odbc){
     model$score = list(Mean_error = mean(score$predict))
     best_models[[model$best_model@model_id]] <- model
   }
-  if('timeseries' %in% to_train){
-    print('   Building ARIMA model...', quote = F)
-    model_id <- paste(prep$runid,set$main$model_name_part,
-                     set$main$label, 'arima',
-                     get_datetime, sep="_")
-    model_ts <- list()
-    model_ts$best_model <- ts_arima(
-      df = main$constants_deleted$value,
-      set = set,
-      model_id = model_id)
+  # if('timeseries' %in% to_train){
+    # print('   Building ARIMA model...', quote = F)
+    # model_id <- paste(prep$runid,set$main$model_name_part,
+    #                  set$main$label, 'arima',
+    #                  get_datetime, sep="_")
+    # model_ts <- list()
+    # model_ts$best_model <- ts_arima(
+    #   df = main$constants_deleted$value,
+    #   set = set,
+    #   model_id = model_id)
     
-    model_ts$score = (model$best_model$arima_metr$RMSE)^2
-    best_models[[model_id]] <- model_ts
+    # model_ts$score = (model$best_model$arima_metr$RMSE)^2
+    # best_models[[model_id]] <- model_ts
     
-  }
+  # }
   if('autoencoder' %in% to_train){
     print('   Building autoencoder model...',quote = F)
     model_id <-paste(runid,set$main$model_name_part,
